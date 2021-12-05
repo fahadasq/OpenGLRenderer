@@ -6,6 +6,7 @@
 #include <buffers/IndexBuffer.h>
 #include <buffers/VertexArray.h>
 #include <buffers/FrameBuffer.h>
+#include <buffers/UniformBuffer.h>
 #include <elems/Shader.h>
 #include <elems/Texture2D.h>
 #include <elems/Camera.h>
@@ -18,10 +19,15 @@ private:
 	std::unique_ptr<Texture2D> m_Texture;
 	std::unique_ptr<Camera> m_Camera;
 	std::unique_ptr<FrameBuffer> m_FrameBuffer;
+	std::unique_ptr<UniformBuffer> m_UniformBuffer;
+	std::unique_ptr<ViewProjection> m_VP;
 	glm::vec2 m_Size;
 
 public:
 	std::unique_ptr<Mesh> m_Mesh;
+	glm::vec3 m_Position;
+
+	
 
 	SceneView(float deltaTime)
 	{
@@ -30,9 +36,20 @@ public:
 		m_FrameBuffer->GenerateBuffers(800, 600);
 		m_Shader = std::make_unique<Shader>("res/shaders/basic.vert", "res/shaders/basic.frag", nullptr);
 		m_Texture = std::make_unique<Texture2D>();
+		m_UniformBuffer = std::make_unique<UniformBuffer>();
+		m_VP = std::make_unique<ViewProjection>();
 		m_Texture->LoadTextureFromFile("res/textures/container.jpg", false);
 
 		m_Camera = std::make_unique<Camera>();
+
+		m_Shader->SetUniformBindingPoint("ViewProjection", 0);
+		m_UniformBuffer->Bind();
+		m_UniformBuffer->SetBindingPoint(0);
+
+		m_VP->view = m_Camera->GetViewMatrix();
+		m_VP->projection = m_Camera->GetProjectionMatrix();
+
+		m_UniformBuffer->SetData(m_VP.get());
 
 		float vertices[] = {
 			// positions          // colors           // texture coords
@@ -55,7 +72,7 @@ public:
 		m_Shader->SetInteger("container", 0);
 		
 		glm::mat4 model(1.0f);
-		model = glm::translate(model, glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::translate(model, m_Position);
 
 		m_Shader->SetMatrix4("model", model);
 

@@ -6,27 +6,36 @@
 void SceneView::Render(float deltaTime)
 {
 	m_Shader->Bind();
-	m_Shader->SetMatrix4("view", m_Camera->GetViewMatrix());
-	m_Shader->SetMatrix4("projection", m_Camera->GetProjectionMatrix());
+	/*m_Shader->SetMatrix4("view", m_Camera->GetViewMatrix());
+	m_Shader->SetMatrix4("projection", m_Camera->GetProjectionMatrix());*/
 
-	m_FrameBuffer->Bind();
+	m_VP->view = m_Camera->GetViewMatrix();
+	m_VP->projection = m_Camera->GetProjectionMatrix();
+	m_UniformBuffer->UpdateData(m_VP.get());
+
+	glm::mat4 model(1.0f);
+	model = glm::translate(model, m_Position);
+
+	m_Shader->SetMatrix4("model", model);
+
+	//m_FrameBuffer->Bind();
 
 	GLCall(glDrawElements(GL_TRIANGLES, m_Mesh->IndexCount, GL_UNSIGNED_INT, 0));
 
-	m_FrameBuffer->Unbind();
+	//m_FrameBuffer->Unbind();
 
-	ImGui::Begin("Scene");
+	//ImGui::Begin("Scene");
 
-	ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-	m_Size = { viewportPanelSize.x, viewportPanelSize.y };
+	//ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+	//m_Size = { viewportPanelSize.x, viewportPanelSize.y };
 
 	m_Camera->SetAspectRatio(m_Size.x / m_Size.y);
 
-	// add rendered texture to ImGUI scene window
-	uint64_t textureID = m_FrameBuffer->GetTexture();
-	ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2{ m_Size.x, m_Size.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+	//// add rendered texture to ImGUI scene window
+	//uint64_t textureID = m_FrameBuffer->GetTexture();
+	//ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2{ m_Size.x, m_Size.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 
-	ImGui::End();
+	//ImGui::End();
 
 	if (CameraMovable)
 	{
@@ -40,5 +49,5 @@ void SceneView::OnResize(int width, int height)
 	m_Size.y = (float)height;
 
 	m_Camera->SetAspectRatio(m_Size.x / m_Size.y);
-	m_FrameBuffer->GenerateBuffers((int)m_Size.x, (int)m_Size.y);
+	//m_FrameBuffer->GenerateBuffers((int)m_Size.x, (int)m_Size.y);
 }

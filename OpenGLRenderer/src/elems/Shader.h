@@ -23,6 +23,7 @@ public:
 	void    SetVector4f(const char* name, float x, float y, float z, float w);
 	void    SetVector4f(const char* name, const glm::vec4& value);
 	void    SetMatrix4(const char* name, const glm::mat4& matrix);
+	void	SetUniformBindingPoint(const char* name, const unsigned int index);
 
 private:
 	GLint GetUniformLocation(const std::string& name);

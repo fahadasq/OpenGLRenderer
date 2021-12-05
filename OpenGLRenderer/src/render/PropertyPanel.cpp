@@ -13,6 +13,8 @@ void PropertyPanel::Render(SceneView* m_Sceneview)
         m_SetMeshCallback("res/models/quad.obj");
     }
 
+    ImGui::SliderFloat3("Position", &m_Sceneview->m_Position.x, -5.0f, 5.0f);
+
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
     ImGui::End();
 }

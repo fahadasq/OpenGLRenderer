@@ -3,6 +3,7 @@
 #include <ErrorHandler.h>
 
 FrameBuffer::FrameBuffer()
+	: m_Width(0), m_Height(0)
 {
 	GLCall(glGenFramebuffers(1, &m_RendererID));
 	GLCall(glGenTextures(1, &m_ColorID));

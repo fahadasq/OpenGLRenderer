@@ -196,3 +196,9 @@ void Shader::SetMatrix4(const char* name, const glm::mat4& matrix)
 
     GLCall(glUniformMatrix4fv(location, 1, false, glm::value_ptr(matrix)));
 }
+
+void Shader::SetUniformBindingPoint(const char* name, const unsigned int index)
+{
+    GLCall(unsigned int blockIndex = glGetUniformBlockIndex(m_RendererID, name));
+    GLCall(glUniformBlockBinding(m_RendererID, blockIndex, index));
+}

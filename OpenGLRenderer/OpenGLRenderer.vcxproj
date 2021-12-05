@@ -236,6 +236,7 @@
     <ClCompile Include="src\window\GLWindow.cpp" />
     <ClCompile Include="src\window\OpenGLContext.cpp" />
     <ClCompile Include="src\window\UIContext.cpp" />
+    <ClCompile Include="src\buffers\UniformBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\elems\Material.h" />
@@ -272,6 +273,7 @@
     <ClInclude Include="src\window\RenderContext.h" />
     <ClInclude Include="src\window\IWindow.h" />
     <ClInclude Include="src\window\UIContext.h" />
+    <ClInclude Include="src\buffers\UniformBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini" />
