@@ -159,6 +159,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\elems\GameObject.cpp" />
     <ClCompile Include="src\elems\Material.cpp" />
     <ClCompile Include="src\elems\Mesh.cpp" />
     <ClCompile Include="src\3rdparty\imgui\imgui.cpp">
@@ -239,6 +240,7 @@
     <ClCompile Include="src\buffers\UniformBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\elems\GameObject.h" />
     <ClInclude Include="src\elems\Material.h" />
     <ClInclude Include="src\elems\Mesh.h" />
     <ClInclude Include="src\3rdparty\imgui\imconfig.h" />

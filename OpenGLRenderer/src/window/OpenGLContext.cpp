@@ -41,7 +41,7 @@ bool OpenGLContext::Init(IWindow* window)
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-    auto glWindow = glfwCreateWindow(window->Width, window->Height, window->Title.c_str(), NULL, NULL);
+    auto glWindow = glfwCreateWindow(window->Width, window->Height, window->Title.c_str(), glfwGetPrimaryMonitor(), NULL);
     window->SetNativeWindow(glWindow);
 
     if (glWindow == NULL)
@@ -58,7 +58,7 @@ bool OpenGLContext::Init(IWindow* window)
     glfwSetWindowSizeCallback(glWindow, on_window_size_callback);
     glfwSetWindowCloseCallback(glWindow, on_window_close_callback);
     glfwMakeContextCurrent(glWindow);
-    //glfwSwapInterval(1);
+    glfwSwapInterval(1);
 
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))

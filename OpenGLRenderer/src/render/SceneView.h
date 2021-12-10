@@ -11,12 +11,13 @@
 #include <elems/Texture2D.h>
 #include <elems/Camera.h>
 #include <elems/Mesh.h>
+#include <ResourceManager.h>
 
 class SceneView
 {
 private:
-	std::unique_ptr<Shader> m_Shader;
-	std::unique_ptr<Texture2D> m_Texture;
+	std::shared_ptr<Shader> m_Shader;
+	std::shared_ptr<Texture2D> m_Texture;
 	std::unique_ptr<Camera> m_Camera;
 	std::unique_ptr<FrameBuffer> m_FrameBuffer;
 	std::unique_ptr<UniformBuffer> m_UniformBuffer;
@@ -34,11 +35,12 @@ public:
 		m_Size = glm::vec2(2560.0f, 1440.0f);
 		m_FrameBuffer = std::make_unique<FrameBuffer>();
 		m_FrameBuffer->GenerateBuffers(800, 600);
-		m_Shader = std::make_unique<Shader>("res/shaders/basic.vert", "res/shaders/basic.frag", nullptr);
-		m_Texture = std::make_unique<Texture2D>();
+		m_Shader = ResourceManager::GetShader("res/shaders/basic.vert", "res/shaders/basic.frag", nullptr);
+		m_Texture = ResourceManager::GetTexture("res/textures/container.jpg");
+		std::cout << ResourceManager::CheckTextureExists("res/textures/container.jpg") << std::endl;
+		std::cout << ResourceManager::CheckShaderExists("res/shaders/basic.vert", "res/shaders/basic.frag", nullptr) << std::endl;
 		m_UniformBuffer = std::make_unique<UniformBuffer>();
 		m_VP = std::make_unique<ViewProjection>();
-		m_Texture->LoadTextureFromFile("res/textures/container.jpg", false);
 
 		m_Camera = std::make_unique<Camera>();
 
@@ -65,7 +67,7 @@ public:
 		};
 
 		m_Mesh = std::make_unique<Mesh>();
-		m_Mesh->Load("res/models/cube.obj");
+		m_Mesh->Load("res/models/monkey.obj");
 
 		m_Texture->Bind(0);
 		m_Shader->Bind();

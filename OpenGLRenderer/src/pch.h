@@ -1,5 +1,6 @@
 #pragma once
 
+
 // Std includes
 #include <string>
 #include <algorithm>
@@ -9,6 +10,7 @@
 #include <sstream>
 #include <iostream>
 #include <memory>
+#include <map>
 #include <unordered_map>
 
 // GL includes

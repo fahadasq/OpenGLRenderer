@@ -27,7 +27,6 @@ void UniformBuffer::Bind() const
 void UniformBuffer::SetData(ViewProjection* vp)
 {	
 	Bind();
-
 	GLCall(glBufferData(GL_UNIFORM_BUFFER, sizeof(ViewProjection), vp, GL_DYNAMIC_DRAW));
 }
 

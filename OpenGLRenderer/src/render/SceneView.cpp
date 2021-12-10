@@ -6,8 +6,6 @@
 void SceneView::Render(float deltaTime)
 {
 	m_Shader->Bind();
-	/*m_Shader->SetMatrix4("view", m_Camera->GetViewMatrix());
-	m_Shader->SetMatrix4("projection", m_Camera->GetProjectionMatrix());*/
 
 	m_VP->view = m_Camera->GetViewMatrix();
 	m_VP->projection = m_Camera->GetProjectionMatrix();
@@ -18,7 +16,6 @@ void SceneView::Render(float deltaTime)
 
 	m_Shader->SetMatrix4("model", model);
 
-	//m_FrameBuffer->Bind();
 
 	GLCall(glDrawElements(GL_TRIANGLES, m_Mesh->IndexCount, GL_UNSIGNED_INT, 0));
 

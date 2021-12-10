@@ -1,13 +1,18 @@
 #pragma once
 
 #include "Shader.h"
+#include "Texture2D.h"
+
+struct MaterialUniformLayout
+{
+	std::unique_ptr<std::vector<Uniform>> uniforms;
+	
+};
 
 class Material
 {
 private:
-	std::unique_ptr<Shader> m_Shader;
-
-	void ParseShaderForUniforms(const char* shaderFile);
+	std::shared_ptr<Shader> m_Shader;
 
 public:
 	Material();

@@ -2,6 +2,44 @@
 
 #include <pch.h>
 
+struct Uniform
+{
+public:
+
+	GLenum type;
+	std::string name;
+
+	Uniform(GLenum type, std::string name) : type(type), name(name) { }
+
+
+	static unsigned int GetSizeOfType(unsigned int type)
+	{
+		switch (type)
+		{
+		case GL_FLOAT:
+			return sizeof(float);
+		case GL_FLOAT_VEC2:
+			return sizeof(glm::vec2);
+		case GL_FLOAT_VEC3:
+			return sizeof(glm::vec3);
+		case GL_FLOAT_VEC4:
+			return sizeof(glm::vec4);
+		case GL_FLOAT_MAT2:
+			return sizeof(glm::mat2);
+		case GL_FLOAT_MAT3:
+			return sizeof(glm::mat3);
+		case GL_FLOAT_MAT4:
+			return sizeof(glm::mat4);
+		case GL_SAMPLER_2D:
+			return sizeof(int);
+		case GL_INT:
+			return sizeof(int);
+		}
+
+		return 0;
+	}
+};
+
 class Shader
 {
 private:
@@ -10,6 +48,7 @@ private:
 public:
 	Shader() : m_RendererID(0) { }
 	Shader(const char* vShaderFile, const char* fShaderFile, const char* gShaderFile);
+	~Shader();
 	void Compile(const char* vertexCode, const char* fragmentCode, const char* geometryCode = nullptr);
 	void LoadShader(const char* vShaderFile, const char* fShaderFile, const char* gShaderFile = nullptr);
 	void Bind() const;
@@ -24,6 +63,7 @@ public:
 	void    SetVector4f(const char* name, const glm::vec4& value);
 	void    SetMatrix4(const char* name, const glm::mat4& matrix);
 	void	SetUniformBindingPoint(const char* name, const unsigned int index);
+	std::vector<Uniform> GetMaterialUniforms();
 
 private:
 	GLint GetUniformLocation(const std::string& name);
