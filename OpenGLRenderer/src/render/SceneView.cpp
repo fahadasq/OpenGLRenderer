@@ -5,7 +5,7 @@
 
 void SceneView::Render(float deltaTime)
 {
-	m_Shader->Bind();
+	m_Material->m_Shader->Bind();
 
 	m_VP->view = m_Camera->GetViewMatrix();
 	m_VP->projection = m_Camera->GetProjectionMatrix();
@@ -14,7 +14,7 @@ void SceneView::Render(float deltaTime)
 	glm::mat4 model(1.0f);
 	model = glm::translate(model, m_Position);
 
-	m_Shader->SetMatrix4("model", model);
+	m_Material->m_Shader->SetMatrix4("model", model);
 
 
 	GLCall(glDrawElements(GL_TRIANGLES, m_Mesh->IndexCount, GL_UNSIGNED_INT, 0));

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <pch.h>
+#include "Texture2D.h"
 
 struct Uniform
 {
@@ -8,8 +9,14 @@ public:
 
 	GLenum type;
 	std::string name;
+	unsigned int size;
+	unsigned int offset;
 
-	Uniform(GLenum type, std::string name) : type(type), name(name) { }
+	Uniform(GLenum type, std::string name) : type(type), name(name) 
+	{
+		size = Uniform::GetSizeOfType(type);
+		offset = 0;
+	}
 
 
 	static unsigned int GetSizeOfType(unsigned int type)
@@ -40,6 +47,25 @@ public:
 	}
 };
 
+struct TextureUniform
+{
+public:
+	unsigned int slot;
+	std::string name;
+	std::shared_ptr<Texture2D> texture;
+
+	TextureUniform() { }
+	TextureUniform(unsigned int slot, const char* name) : slot(slot), name(name) { texture = std::make_shared<Texture2D>(); }
+
+	void Bind() const { texture->Bind(slot); }
+};
+
+struct MaterialUniformLayout
+{
+	std::vector<Uniform> uniforms;
+	std::vector<TextureUniform> texUniforms;
+};
+
 class Shader
 {
 private:
@@ -63,7 +89,7 @@ public:
 	void    SetVector4f(const char* name, const glm::vec4& value);
 	void    SetMatrix4(const char* name, const glm::mat4& matrix);
 	void	SetUniformBindingPoint(const char* name, const unsigned int index);
-	std::vector<Uniform> GetMaterialUniforms();
+	MaterialUniformLayout GetMaterialUniforms();
 
 private:
 	GLint GetUniformLocation(const std::string& name);

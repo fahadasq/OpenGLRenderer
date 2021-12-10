@@ -22,4 +22,6 @@ public:
 
 private:
 	std::function<void(const std::string&)> m_SetMeshCallback;
+	void DisplayUniformVariable(char* buffer, Uniform& uniform);
+	void DisplayTextureUniform(TextureUniform& uniform);
 };

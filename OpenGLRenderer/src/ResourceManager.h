@@ -11,12 +11,7 @@ public:
 	const char* gShaderFile;
 
 	ShaderSpecs() { }
-	ShaderSpecs(const char* vFile, const char* fFile, const char* gFile = nullptr)
-	{
-		vShaderFile = vFile;
-		fShaderFile = fFile;
-		gShaderFile = gFile;
-	}
+	ShaderSpecs(const char* vFile, const char* fFile, const char* gFile = nullptr) : vShaderFile(vFile), fShaderFile(fFile), gShaderFile(gFile) { }
 
 	bool operator==(const ShaderSpecs& o) const {
 		return vShaderFile == o.vShaderFile && fShaderFile == o.fShaderFile && ((gShaderFile != nullptr) ? gShaderFile == o.gShaderFile : true);

@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Shader.h"
+#include "Material.h"
 #include "Mesh.h"
 
 class GameObject
 {
 private:
-	std::shared_ptr<Shader> m_Shader;
+	std::shared_ptr<Material> m_Shader;
 	std::shared_ptr<Mesh> m_Mesh;
 	glm::vec3 m_Position;
 public:

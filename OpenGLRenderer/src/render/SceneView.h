@@ -10,13 +10,13 @@
 #include <elems/Shader.h>
 #include <elems/Texture2D.h>
 #include <elems/Camera.h>
+#include <elems/Material.h>
 #include <elems/Mesh.h>
 #include <ResourceManager.h>
 
 class SceneView
 {
 private:
-	std::shared_ptr<Shader> m_Shader;
 	std::shared_ptr<Texture2D> m_Texture;
 	std::unique_ptr<Camera> m_Camera;
 	std::unique_ptr<FrameBuffer> m_FrameBuffer;
@@ -26,6 +26,7 @@ private:
 
 public:
 	std::unique_ptr<Mesh> m_Mesh;
+	std::shared_ptr<Material> m_Material;
 	glm::vec3 m_Position;
 
 	
@@ -35,7 +36,8 @@ public:
 		m_Size = glm::vec2(2560.0f, 1440.0f);
 		m_FrameBuffer = std::make_unique<FrameBuffer>();
 		m_FrameBuffer->GenerateBuffers(800, 600);
-		m_Shader = ResourceManager::GetShader("res/shaders/basic.vert", "res/shaders/basic.frag", nullptr);
+		//m_Shader = ResourceManager::GetShader("res/shaders/basic.vert", "res/shaders/basic.frag", nullptr);
+		m_Material = std::make_shared<Material>("res/shaders/basic.vert", "res/shaders/basic.frag", nullptr);
 		m_Texture = ResourceManager::GetTexture("res/textures/container.jpg");
 		std::cout << ResourceManager::CheckTextureExists("res/textures/container.jpg") << std::endl;
 		std::cout << ResourceManager::CheckShaderExists("res/shaders/basic.vert", "res/shaders/basic.frag", nullptr) << std::endl;
@@ -44,7 +46,7 @@ public:
 
 		m_Camera = std::make_unique<Camera>();
 
-		m_Shader->SetUniformBindingPoint("ViewProjection", 0);
+		m_Material->m_Shader->SetUniformBindingPoint("ViewProjection", 0);
 		m_UniformBuffer->Bind();
 		m_UniformBuffer->SetBindingPoint(0);
 
@@ -70,13 +72,13 @@ public:
 		m_Mesh->Load("res/models/monkey.obj");
 
 		m_Texture->Bind(0);
-		m_Shader->Bind();
-		m_Shader->SetInteger("container", 0);
+		m_Material->m_Shader->Bind();
+		m_Material->m_Shader->SetInteger("u_Material.tex", 0);
 		
 		glm::mat4 model(1.0f);
 		model = glm::translate(model, m_Position);
 
-		m_Shader->SetMatrix4("model", model);
+		m_Material->m_Shader->SetMatrix4("model", model);
 
 		m_Camera->Update(deltaTime);
 		m_Camera->SetAspectRatio(m_Size.x / m_Size.y);

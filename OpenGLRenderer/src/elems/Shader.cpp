@@ -208,9 +208,11 @@ void Shader::SetUniformBindingPoint(const char* name, const unsigned int index)
     GLCall(glUniformBlockBinding(m_RendererID, blockIndex, index));
 }
 
-std::vector<Uniform> Shader::GetMaterialUniforms()
+MaterialUniformLayout Shader::GetMaterialUniforms()
 {
+    MaterialUniformLayout uniformLayout;
     std::vector<Uniform> materialUniforms;
+    std::vector<TextureUniform> texUniforms;
 
     GLint i;
     GLint count;
@@ -225,6 +227,8 @@ std::vector<Uniform> Shader::GetMaterialUniforms()
     GLCall(glGetProgramiv(m_RendererID, GL_ACTIVE_UNIFORMS, &count));
     printf("Active Uniforms: %d\n", count);
 
+    unsigned int slot = 0;
+
     for (i = 0; i < count; i++)
     {
         GLCall(glGetActiveUniform(m_RendererID, (GLuint)i, bufSize, &length, &size, &type, name));
@@ -233,12 +237,23 @@ std::vector<Uniform> Shader::GetMaterialUniforms()
 
         if (nameStr.find("u_Material") != std::string::npos)
         {
-            Uniform uniform(type, name);
-            materialUniforms.push_back(uniform);
-            printf("Uniform #%d Type: %u Name: %s\n", i, uniform.type, name);
-            std::cout << "Size: " << size << std::endl;
+            if (type != GL_SAMPLER_2D)
+            {
+                Uniform uniform(type, name);
+                materialUniforms.push_back(uniform);
+                std::cout << name << std::endl;
+            }
+            else
+            {
+                TextureUniform texUniform(slot, name);
+                texUniforms.push_back(texUniform);
+                slot++;
+            }
         }
     }
 
-    return materialUniforms;
+    uniformLayout.uniforms = materialUniforms;
+    uniformLayout.texUniforms = texUniforms;
+
+    return uniformLayout;
 }
