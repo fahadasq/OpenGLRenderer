@@ -29,19 +29,21 @@ void PropertyPanel::Render(SceneView* m_Sceneview)
         ImGuiFileDialog::Instance()->Close();
     }
 
-    char* buffer = m_Sceneview->m_Material->m_UniformBuffer;
-    for (Uniform i : m_Sceneview->m_Material->m_Material->m_UniformLayout->uniforms)
+
+    char* buffer = m_Sceneview->m_Object->m_Material->m_UniformBuffer;
+    for (Uniform uniform : m_Sceneview->m_Object->m_Material->m_MaterialType->m_UniformLayout->uniforms)
     {
-        DisplayUniformVariable(buffer, i);
+        DisplayUniformVariable(buffer, uniform);
     }
-    for (int i = 0; i < m_Sceneview->m_Material->m_Material->m_UniformLayout->texUniforms.size(); i++)
+    for (int i = 0; i < m_Sceneview->m_Object->m_Material->m_MaterialType->m_UniformLayout->texUniforms.size(); i++)
     {
-        DisplayTextureUniform(m_Sceneview->m_Material->m_Material->m_UniformLayout->texUniforms[i]);
+        DisplayTextureUniform(m_Sceneview->m_Object->m_Material->m_MaterialType->m_UniformLayout->texUniforms[i]);
     }
 
-    ImGui::SliderFloat3("Position", &m_Sceneview->m_Position.x, -5.0f, 5.0f);
-
-    m_Sceneview->m_Material->SetUniforms();
+    ImGui::DragFloat3("Position", &m_Sceneview->m_Object->m_Transform.m_Position.x);
+    ImGui::DragFloat3("Rotation", &m_Sceneview->m_Object->m_Transform.m_Rotation.x);
+    ImGui::DragFloat3("Scale", &m_Sceneview->m_Object->m_Transform.m_Scale.x);    
+    m_Sceneview->m_Object->m_Material->SetUniforms();
 
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
     ImGui::End();
@@ -73,7 +75,7 @@ void PropertyPanel::DisplayTextureUniform(TextureUniform& uniform)
 {
     // open Dialog Simple
     if (ImGui::Button(uniform.name.c_str()))
-        ImGuiFileDialog::Instance()->OpenDialog("SetTexture", "Choose File", ".png,.jpg,.jpeg", ".");
+        ImGuiFileDialog::Instance()->OpenDialog("SetTexture", "Choose File", ".jpg,.jpeg,.png", ".");
 
     // display
     if (ImGuiFileDialog::Instance()->Display("SetTexture"))
@@ -90,3 +92,5 @@ void PropertyPanel::DisplayTextureUniform(TextureUniform& uniform)
         ImGuiFileDialog::Instance()->Close();
     }
 }
+
+

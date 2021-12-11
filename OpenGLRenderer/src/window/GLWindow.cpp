@@ -15,7 +15,7 @@ bool GLWindow::Init(int width, int height, const std::string& title)
 	m_SceneView = std::make_unique<SceneView>(deltaTime);
 	m_PropertyPanel = std::make_unique<PropertyPanel>();
 
-	m_PropertyPanel->SetMeshCallbackFunction([this](std::string filepath) { m_SceneView->m_Mesh->Load(filepath); });
+	m_PropertyPanel->SetMeshCallbackFunction([this](std::string filepath) { m_SceneView->m_Object->m_Mesh->Load(filepath); });
 
 	return true;
 }

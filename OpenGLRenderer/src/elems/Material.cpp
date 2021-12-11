@@ -26,6 +26,16 @@ Material::~Material()
 {
 }
 
+void Material::Bind() const
+{
+	m_Shader->Bind();
+}
+
+void Material::SetUniformBindingPoint(const char* name, const unsigned int index)
+{
+	m_Shader->SetUniformBindingPoint(name, index);
+}
+
 void Material::Generate(const char* vShaderFile, const char* fShaderFile, const char* gShaderFile)
 {
 	m_Shader = ResourceManager::GetShader(vShaderFile, fShaderFile, gShaderFile);

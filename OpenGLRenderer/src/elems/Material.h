@@ -17,5 +17,7 @@ public:
 	~Material();
 
 
+	void Bind() const;
+	void SetUniformBindingPoint(const char* name, const unsigned int index);
 	void Generate(const char* vShaderFile, const char* fShaderFile, const char* gShaderFile = nullptr);
 };

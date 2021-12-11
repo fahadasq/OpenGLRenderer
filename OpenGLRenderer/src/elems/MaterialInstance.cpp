@@ -4,8 +4,8 @@
 
 MaterialInstance::MaterialInstance(const char* vShaderFile, const char* fShaderFile, const char* gShaderFile)
 {
-	m_Material = ResourceManager::GetMaterial(vShaderFile, fShaderFile, gShaderFile);
-	m_UniformBuffer = new char[m_Material->m_BufferSize];
+	m_MaterialType = ResourceManager::GetMaterial(vShaderFile, fShaderFile, gShaderFile);
+	m_UniformBuffer = new char[m_MaterialType->m_BufferSize];
 }
 
 MaterialInstance::~MaterialInstance()
@@ -13,16 +13,27 @@ MaterialInstance::~MaterialInstance()
 	delete[] m_UniformBuffer;
 }
 
+void MaterialInstance::Bind()
+{
+	m_MaterialType->Bind();
+	SetUniforms();
+}
+
+void MaterialInstance::SetUniformBindingPoint(const char* name, const unsigned int index)
+{
+	m_MaterialType->SetUniformBindingPoint(name, index);
+}
+
 void MaterialInstance::SetUniforms()
 {
-	for (unsigned int i = 0; i < m_Material->m_UniformLayout->texUniforms.size(); i++)
+	for (unsigned int i = 0; i < m_MaterialType->m_UniformLayout->texUniforms.size(); i++)
 	{
-		m_Material->m_UniformLayout->texUniforms[i].Bind();
+		m_MaterialType->m_UniformLayout->texUniforms[i].Bind();
 	}
 
-	for (int i = 0; i < m_Material->m_UniformLayout->uniforms.size(); i++)
+	for (int i = 0; i < m_MaterialType->m_UniformLayout->uniforms.size(); i++)
 	{
-		Uniform uni = m_Material->m_UniformLayout->uniforms[i];
+		Uniform uni = m_MaterialType->m_UniformLayout->uniforms[i];
 		SetUniformValue(uni, &m_UniformBuffer[uni.offset]);
 	}
 
@@ -33,22 +44,22 @@ void MaterialInstance::SetUniformValue(Uniform uniform, void* data)
 	switch (uniform.type)
 	{
 	case GL_FLOAT:
-		m_Material->m_Shader->SetFloat(uniform.name.c_str(), *((float*)data));
+		m_MaterialType->m_Shader->SetFloat(uniform.name.c_str(), *((float*)data));
 		break;
 	case GL_FLOAT_VEC2:
-		m_Material->m_Shader->SetVector2f(uniform.name.c_str(), *((glm::vec2*)data));
+		m_MaterialType->m_Shader->SetVector2f(uniform.name.c_str(), *((glm::vec2*)data));
 		break;
 	case GL_FLOAT_VEC3:
-		m_Material->m_Shader->SetVector3f(uniform.name.c_str(), *((glm::vec3*)data));
+		m_MaterialType->m_Shader->SetVector3f(uniform.name.c_str(), *((glm::vec3*)data));
 		break;
 	case GL_FLOAT_VEC4:
-		m_Material->m_Shader->SetVector4f(uniform.name.c_str(), *((glm::vec4*)data));
+		m_MaterialType->m_Shader->SetVector4f(uniform.name.c_str(), *((glm::vec4*)data));
 		break;
 	case GL_FLOAT_MAT4:
-		m_Material->m_Shader->SetMatrix4(uniform.name.c_str(), *((glm::mat4*)data));
+		m_MaterialType->m_Shader->SetMatrix4(uniform.name.c_str(), *((glm::mat4*)data));
 		break;
 	case GL_INT:
-		m_Material->m_Shader->SetInteger(uniform.name.c_str(), *((int*)data));
+		m_MaterialType->m_Shader->SetInteger(uniform.name.c_str(), *((int*)data));
 		break;
 	}
 }
