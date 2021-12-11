@@ -9,14 +9,13 @@ private:
 
 public:
 	std::shared_ptr<Shader> m_Shader;
-	std::unique_ptr<MaterialUniformLayout> m_UniformLayout;
+	std::shared_ptr<MaterialUniformLayout> m_UniformLayout;
+	unsigned int m_BufferSize;
+
 	Material();
 	Material(const char* vShaderFile, const char* fShaderFile, const char* gShaderFile);
 	~Material();
 
-	char* m_UniformBuffer;
 
 	void Generate(const char* vShaderFile, const char* fShaderFile, const char* gShaderFile = nullptr);
-	void SetUniforms();
-	void SetUniformValue(Uniform uniform, void* data);
 };

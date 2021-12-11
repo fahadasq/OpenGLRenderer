@@ -30,13 +30,13 @@ void PropertyPanel::Render(SceneView* m_Sceneview)
     }
 
     char* buffer = m_Sceneview->m_Material->m_UniformBuffer;
-    for (Uniform i : m_Sceneview->m_Material->m_UniformLayout->uniforms)
+    for (Uniform i : m_Sceneview->m_Material->m_Material->m_UniformLayout->uniforms)
     {
         DisplayUniformVariable(buffer, i);
     }
-    for (int i = 0; i < m_Sceneview->m_Material->m_UniformLayout->texUniforms.size(); i++)
+    for (int i = 0; i < m_Sceneview->m_Material->m_Material->m_UniformLayout->texUniforms.size(); i++)
     {
-        DisplayTextureUniform(m_Sceneview->m_Material->m_UniformLayout->texUniforms[i]);
+        DisplayTextureUniform(m_Sceneview->m_Material->m_Material->m_UniformLayout->texUniforms[i]);
     }
 
     ImGui::SliderFloat3("Position", &m_Sceneview->m_Position.x, -5.0f, 5.0f);

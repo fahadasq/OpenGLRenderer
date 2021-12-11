@@ -13,6 +13,7 @@
 #include <elems/Material.h>
 #include <elems/Mesh.h>
 #include <ResourceManager.h>
+#include <elems/MaterialInstance.h>
 
 class SceneView
 {
@@ -25,8 +26,8 @@ private:
 	glm::vec2 m_Size;
 
 public:
-	std::unique_ptr<Mesh> m_Mesh;
-	std::shared_ptr<Material> m_Material;
+	std::shared_ptr<Mesh> m_Mesh;
+	std::unique_ptr<MaterialInstance> m_Material;
 	glm::vec3 m_Position;
 
 	
@@ -37,7 +38,7 @@ public:
 		m_FrameBuffer = std::make_unique<FrameBuffer>();
 		m_FrameBuffer->GenerateBuffers(800, 600);
 		//m_Shader = ResourceManager::GetShader("res/shaders/basic.vert", "res/shaders/basic.frag", nullptr);
-		m_Material = std::make_shared<Material>("res/shaders/basic.vert", "res/shaders/basic.frag", nullptr);
+		m_Material = std::make_unique<MaterialInstance>("res/shaders/basic.vert", "res/shaders/basic.frag", nullptr);
 		m_Texture = ResourceManager::GetTexture("res/textures/container.jpg");
 		std::cout << ResourceManager::CheckTextureExists("res/textures/container.jpg") << std::endl;
 		std::cout << ResourceManager::CheckShaderExists("res/shaders/basic.vert", "res/shaders/basic.frag", nullptr) << std::endl;
@@ -46,7 +47,7 @@ public:
 
 		m_Camera = std::make_unique<Camera>();
 
-		m_Material->m_Shader->SetUniformBindingPoint("ViewProjection", 0);
+		m_Material->m_Material->m_Shader->SetUniformBindingPoint("ViewProjection", 0);
 		m_UniformBuffer->Bind();
 		m_UniformBuffer->SetBindingPoint(0);
 
@@ -68,17 +69,16 @@ public:
 			0, 3, 2
 		};
 
-		m_Mesh = std::make_unique<Mesh>();
-		m_Mesh->Load("res/models/monkey.obj");
+		m_Mesh = ResourceManager::GetMesh("res/models/monkey.obj");
 
 		m_Texture->Bind(0);
-		m_Material->m_Shader->Bind();
-		m_Material->m_Shader->SetInteger("u_Material.tex", 0);
+		m_Material->m_Material->m_Shader->Bind();
+		m_Material->m_Material->m_Shader->SetInteger("u_Material.tex", 0);
 		
 		glm::mat4 model(1.0f);
 		model = glm::translate(model, m_Position);
 
-		m_Material->m_Shader->SetMatrix4("model", model);
+		m_Material->m_Material->m_Shader->SetMatrix4("model", model);
 
 		m_Camera->Update(deltaTime);
 		m_Camera->SetAspectRatio(m_Size.x / m_Size.y);
