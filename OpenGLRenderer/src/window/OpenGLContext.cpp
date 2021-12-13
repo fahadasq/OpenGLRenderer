@@ -41,7 +41,7 @@ bool OpenGLContext::Init(IWindow* window)
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-    auto glWindow = glfwCreateWindow(window->Width, window->Height, window->Title.c_str(), NULL, NULL);
+    auto glWindow = glfwCreateWindow(window->Width, window->Height, window->Title.c_str(), glfwGetPrimaryMonitor(), NULL);
     window->SetNativeWindow(glWindow);
 
     if (glWindow == NULL)

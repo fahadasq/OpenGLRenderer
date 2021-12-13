@@ -23,15 +23,18 @@ private:
 	std::unique_ptr<Camera> m_Camera;
 	std::unique_ptr<UniformBuffer> m_UniformBuffer;
 	std::unique_ptr<ViewProjection> m_VP;
+	std::unique_ptr<FrameBuffer> m_FrameBuffer;
 	glm::vec2 m_Size;
 
 public:
-	std::shared_ptr<GameObject> m_SelectedObject;
+	std::weak_ptr<GameObject> m_SelectedObject;
 	std::unique_ptr<Scene> m_Scene;
 	
 
 	SceneView(float deltaTime)
 	{
+		m_FrameBuffer = std::make_unique<FrameBuffer>();
+		m_FrameBuffer->GenerateBuffers(2560, 1440);
 		m_Size = glm::vec2(2560.0f, 1440.0f);
 		m_UniformBuffer = std::make_unique<UniformBuffer>();
 		m_VP = std::make_unique<ViewProjection>();
@@ -43,7 +46,7 @@ public:
 		m_VP->projection = m_Camera->GetProjectionMatrix();
 
 		m_UniformBuffer->SetData(m_VP.get());
-		
+
 		m_Camera->Update(deltaTime);
 		m_Camera->SetAspectRatio(m_Size.x / m_Size.y);
 

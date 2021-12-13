@@ -32,5 +32,8 @@ public:
 	unsigned int IndexCount;
 
 	void Load(const std::string& filepath);
+
+	const std::vector<Vertex>& GetVertices() const { return m_Vertices; }
+	const std::vector<unsigned int>& GetIndices() const { return m_Indices; }
 };
 

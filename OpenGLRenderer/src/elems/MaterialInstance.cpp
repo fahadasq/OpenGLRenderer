@@ -5,8 +5,8 @@
 MaterialInstance::MaterialInstance(const char* vShaderFile, const char* fShaderFile, const char* gShaderFile)
 {
 	m_MaterialType = ResourceManager::GetMaterial(vShaderFile, fShaderFile, gShaderFile);
-	m_UniformBuffer = new char[m_MaterialType->m_BufferSize];
-	for (Uniform i : m_MaterialType->m_UniformLayout->uniforms)
+	m_UniformBuffer = new char[m_MaterialType->GetBufferSize()];
+	for (Uniform i : m_MaterialType->GetUniformLayout()->uniforms)
 	{
 		Uniform::SetDefaultValue(&m_UniformBuffer[i.offset], i.type);
 	}
@@ -15,6 +15,16 @@ MaterialInstance::MaterialInstance(const char* vShaderFile, const char* fShaderF
 MaterialInstance::~MaterialInstance()
 {
 	delete[] m_UniformBuffer;
+}
+
+void MaterialInstance::Generate(const char* vShaderFile, const char* fShaderFile, const char* gShaderFile)
+{
+	m_MaterialType = ResourceManager::GetMaterial(vShaderFile, fShaderFile, gShaderFile);
+	m_UniformBuffer = new char[m_MaterialType->GetBufferSize()];
+	for (Uniform i : m_MaterialType->GetUniformLayout()->uniforms)
+	{
+		Uniform::SetDefaultValue(&m_UniformBuffer[i.offset], i.type);
+	}
 }
 
 void MaterialInstance::Bind()
@@ -30,14 +40,16 @@ void MaterialInstance::SetUniformBindingPoint(const char* name, const unsigned i
 
 void MaterialInstance::SetUniforms()
 {
-	for (unsigned int i = 0; i < m_MaterialType->m_UniformLayout->texUniforms.size(); i++)
+	std::shared_ptr<MaterialUniformLayout> uniformLayout = m_MaterialType->GetUniformLayout();
+
+	for (unsigned int i = 0; i < uniformLayout->texUniforms.size(); i++)
 	{
-		m_MaterialType->m_UniformLayout->texUniforms[i].Bind();
+		uniformLayout->texUniforms[i].Bind();
 	}
 
-	for (int i = 0; i < m_MaterialType->m_UniformLayout->uniforms.size(); i++)
+	for (int i = 0; i < uniformLayout->uniforms.size(); i++)
 	{
-		Uniform uni = m_MaterialType->m_UniformLayout->uniforms[i];
+		Uniform uni = uniformLayout->uniforms[i];
 		SetUniformValue(uni, &m_UniformBuffer[uni.offset]);
 	}
 
@@ -45,25 +57,27 @@ void MaterialInstance::SetUniforms()
 
 void MaterialInstance::SetUniformValue(Uniform uniform, void* data)
 {
+	std::shared_ptr<Shader> shader = m_MaterialType->GetShader();
+
 	switch (uniform.type)
 	{
 	case GL_FLOAT:
-		m_MaterialType->m_Shader->SetFloat(uniform.name.c_str(), *((float*)data));
+		shader->SetFloat(uniform.name.c_str(), *((float*)data));
 		break;
 	case GL_FLOAT_VEC2:
-		m_MaterialType->m_Shader->SetVector2f(uniform.name.c_str(), *((glm::vec2*)data));
+		shader->SetVector2f(uniform.name.c_str(), *((glm::vec2*)data));
 		break;
 	case GL_FLOAT_VEC3:
-		m_MaterialType->m_Shader->SetVector3f(uniform.name.c_str(), *((glm::vec3*)data));
+		shader->SetVector3f(uniform.name.c_str(), *((glm::vec3*)data));
 		break;
 	case GL_FLOAT_VEC4:
-		m_MaterialType->m_Shader->SetVector4f(uniform.name.c_str(), *((glm::vec4*)data));
+		shader->SetVector4f(uniform.name.c_str(), *((glm::vec4*)data));
 		break;
 	case GL_FLOAT_MAT4:
-		m_MaterialType->m_Shader->SetMatrix4(uniform.name.c_str(), *((glm::mat4*)data));
+		shader->SetMatrix4(uniform.name.c_str(), *((glm::mat4*)data));
 		break;
 	case GL_INT:
-		m_MaterialType->m_Shader->SetInteger(uniform.name.c_str(), *((int*)data));
+		shader->SetInteger(uniform.name.c_str(), *((int*)data));
 		break;
 	}
 }

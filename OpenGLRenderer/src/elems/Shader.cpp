@@ -248,7 +248,6 @@ MaterialUniformLayout Shader::GetMaterialUniforms()
     GLsizei length; // name length
 
     GLCall(glGetProgramiv(m_RendererID, GL_ACTIVE_UNIFORMS, &count));
-    printf("Active Uniforms: %d\n", count);
 
     unsigned int slot = 0;
 
@@ -264,7 +263,6 @@ MaterialUniformLayout Shader::GetMaterialUniforms()
             {
                 Uniform uniform(type, name);
                 materialUniforms.push_back(uniform);
-                std::cout << name << std::endl;
             }
             else
             {

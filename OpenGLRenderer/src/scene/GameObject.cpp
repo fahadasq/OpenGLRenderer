@@ -40,20 +40,12 @@ void GameObject::SetMaterial(const char* vFilePath, const char* fFilePath, const
 void GameObject::SetMesh(const char* meshFilePath)
 {
 	m_Mesh = ResourceManager::GetMesh(meshFilePath);
-	for (auto iter : ResourceManager::m_Meshes)
-	{
-		std::cout << "Reference Count For " << iter.first << ": " << iter.second.use_count() << std::endl;
-		bool doesExist = ResourceManager::CheckMeshExists(iter.first.c_str());
-		std::cout << "Is Active: " << doesExist << std::endl;
-		if (doesExist)
-		std::cout << "Index Count: " << iter.second.lock()->IndexCount << std::endl;
-	}
 }
 
 void GameObject::Bind()
 {
-	m_Mesh->Bind();
 	m_Material->Bind();
+	m_Mesh->Bind();
 }
 
 void GameObject::Render()
@@ -66,10 +58,10 @@ void GameObject::Render()
 
 void GameObject::SetUniform(const char* name, const glm::mat4& value)
 {
-	m_Material->m_MaterialType->m_Shader->SetMatrix4(name, value);
+	m_Material->GetMaterialType()->GetShader()->SetMatrix4(name, value);
 }
 
 void GameObject::BindUniformBlocks()
 {
-	m_Material->m_MaterialType->m_Shader->BindUniformBlocks();
+	m_Material->GetMaterialType()->GetShader()->BindUniformBlocks();
 }

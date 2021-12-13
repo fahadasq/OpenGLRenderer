@@ -2,6 +2,8 @@
 
 #include <3rdparty/imgui/imgui.h>
 #include "SceneView.h"
+#include "panels/SceneHierarchyPanel.h"
+#include "panels/InspectorPanel.h"
 #include <functional>
 
 class PropertyPanel
@@ -10,14 +12,14 @@ public:
 
 	PropertyPanel()
 	{
-
+		m_InspectorPanel = std::make_unique<InspectorPanel>();
+		m_HierarchyPanel = std::make_unique<SceneHierarchyPanel>();
 	}
 
 	void Render(SceneView* m_Scene);
 
 
 private:
-	void DisplayUniformVariable(char* buffer, Uniform& uniform);
-	void DisplayTextureUniform(TextureUniform& uniform);
-	void DisplayObjectInfo(GameObject* object);
+	std::unique_ptr<InspectorPanel> m_InspectorPanel;
+	std::unique_ptr<SceneHierarchyPanel> m_HierarchyPanel;
 };

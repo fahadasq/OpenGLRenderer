@@ -43,7 +43,6 @@ void Material::Generate(const char* vShaderFile, const char* fShaderFile, const 
 {
 	m_Shader = ResourceManager::GetShader(vShaderFile, fShaderFile, gShaderFile);
 	m_UniformLayout = ResourceManager::GetUniformLayout(vShaderFile, fShaderFile, gShaderFile);
-	std::cout << "Size of Layout Vector: " << m_UniformLayout->uniforms.size() << std::endl;
 
 	int size = 0;
 

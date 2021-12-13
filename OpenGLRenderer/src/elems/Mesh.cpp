@@ -51,9 +51,9 @@ void Mesh::DeleteBuffers()
 
 void Mesh::Bind()
 {
-    m_VertexBuffer->Bind();
-    m_IndexBuffer->Bind();
     m_VertexArray->Bind();
+    m_IndexBuffer->Bind();
+    m_VertexBuffer->Bind();
     IndexCount = m_IndexBuffer->GetCount();
 }
 
@@ -102,7 +102,5 @@ void Mesh::Load(const std::string& filepath)
         }
 
         CreateBuffers();
-
-        std::cout << "Loaded Mesh " << filepath << std::endl;
     }
 }
