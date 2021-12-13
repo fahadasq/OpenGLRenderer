@@ -3,10 +3,13 @@
 #include <ResourceManager.h>
 
 Material::Material()
+	: m_Shader(nullptr), m_UniformLayout(nullptr), m_BufferSize(0)
 {
+
 }
 
 Material::Material(const char* vShaderFile, const char* fShaderFile, const char* gShaderFile)
+	: m_Shader(nullptr), m_UniformLayout(nullptr), m_BufferSize(0)
 {
 	m_Shader = ResourceManager::GetShader(vShaderFile, fShaderFile, gShaderFile);
 	m_UniformLayout = ResourceManager::GetUniformLayout(vShaderFile, fShaderFile, gShaderFile);

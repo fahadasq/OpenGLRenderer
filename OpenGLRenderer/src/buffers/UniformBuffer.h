@@ -1,10 +1,8 @@
 #pragma once
-#include <elems/Camera.h>
+#include <scene/Camera.h>
+#include <elems/UniformBufferStructs.h>
 
-struct ViewProjection {
-	glm::mat4 view;
-	glm::mat4 projection;
-};
+
 
 class UniformBuffer
 {

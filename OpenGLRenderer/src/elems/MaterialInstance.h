@@ -5,6 +5,7 @@
 class MaterialInstance
 {
 private:
+
 public:
 	std::shared_ptr<Material> m_MaterialType;
 

@@ -15,13 +15,9 @@ public:
 
 	void Render(SceneView* m_Scene);
 
-	void SetMeshCallbackFunction(const std::function<void(const std::string&)>& callback)
-	{
-		m_SetMeshCallback = callback;
-	}
 
 private:
-	std::function<void(const std::string&)> m_SetMeshCallback;
 	void DisplayUniformVariable(char* buffer, Uniform& uniform);
 	void DisplayTextureUniform(TextureUniform& uniform);
+	void DisplayObjectInfo(GameObject* object);
 };

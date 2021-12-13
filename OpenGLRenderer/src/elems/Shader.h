@@ -45,6 +45,60 @@ public:
 
 		return 0;
 	}
+
+	static void SetDefaultValue(void* buffer, unsigned int type)
+	{
+		switch (type)
+		{
+		case GL_FLOAT:
+		{
+			float floatValue = 1.0f;
+			memcpy(buffer, &floatValue, sizeof(float));
+		}
+			break;
+		case GL_FLOAT_VEC2:
+		{
+			glm::vec2 vec2Value(1.0f);
+			memcpy(buffer, &vec2Value, sizeof(glm::vec2));
+		}
+			break;
+		case GL_FLOAT_VEC3:
+		{
+			glm::vec3 vec3Value(1.0f);
+			memcpy(buffer, &vec3Value, sizeof(glm::vec3));
+		}
+			break;
+		case GL_FLOAT_VEC4:
+		{
+			glm::vec4 vec4Value(1.0f);
+			memcpy(buffer, &vec4Value, sizeof(glm::vec4));
+		}	break;
+
+		case GL_FLOAT_MAT2:
+		{
+			glm::mat2 mat2Value(1.0f);
+			memcpy(buffer, &mat2Value, sizeof(glm::mat2));
+		}	break;
+
+		case GL_FLOAT_MAT3:
+		{
+			glm::mat3 mat3Value(1.0f);
+			memcpy(buffer, &mat3Value, sizeof(glm::mat3));
+		}	break;
+
+		case GL_FLOAT_MAT4:
+		{
+			glm::mat4 mat4Value(1.0f);
+			memcpy(buffer, &mat4Value, sizeof(glm::mat4));
+		}	break;
+		case GL_INT:
+		{
+			int intValue = 1;
+			memcpy(buffer, &intValue, sizeof(int));
+		}	break;
+
+		}
+	}
 };
 
 struct TextureUniform
@@ -54,7 +108,7 @@ public:
 	std::string name;
 	std::shared_ptr<Texture2D> texture;
 
-	TextureUniform() { }
+	TextureUniform() : slot(0), name(""), texture(nullptr) { }
 	TextureUniform(unsigned int slot, const char* name) : slot(slot), name(name) { texture = std::make_shared<Texture2D>(); }
 
 	void Bind() const { texture->Bind(slot); }
@@ -89,6 +143,7 @@ public:
 	void    SetVector4f(const char* name, const glm::vec4& value);
 	void    SetMatrix4(const char* name, const glm::mat4& matrix);
 	void	SetUniformBindingPoint(const char* name, const unsigned int index);
+	void	BindUniformBlocks();
 	MaterialUniformLayout GetMaterialUniforms();
 
 private:

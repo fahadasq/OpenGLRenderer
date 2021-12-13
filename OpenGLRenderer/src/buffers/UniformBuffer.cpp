@@ -27,13 +27,14 @@ void UniformBuffer::Bind() const
 void UniformBuffer::SetData(ViewProjection* vp)
 {	
 	Bind();
+	SetBindingPoint(ViewProjection::slot);
 	GLCall(glBufferData(GL_UNIFORM_BUFFER, sizeof(ViewProjection), vp, GL_DYNAMIC_DRAW));
 }
 
 void UniformBuffer::UpdateData(ViewProjection* vp)
 {
-	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(vp->view));
-	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(vp->projection));
+	GLCall(glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(vp->view)));
+	GLCall(glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(vp->projection)));
 }
 
 void UniformBuffer::SetBindingPoint(const unsigned int index)

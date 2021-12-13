@@ -1,7 +1,7 @@
 #include <pch.h>
 #include "Shader.h"
 #include <ErrorHandler.h>
-
+#include "UniformBufferStructs.h"
 
 Shader::Shader(const char* vShaderFile, const char* fShaderFile, const char* gShaderFile)
 {
@@ -204,8 +204,31 @@ void Shader::SetMatrix4(const char* name, const glm::mat4& matrix)
 
 void Shader::SetUniformBindingPoint(const char* name, const unsigned int index)
 {
+    Bind();
     GLCall(unsigned int blockIndex = glGetUniformBlockIndex(m_RendererID, name));
     GLCall(glUniformBlockBinding(m_RendererID, blockIndex, index));
+}
+
+void Shader::BindUniformBlocks()
+{
+    int blockCount;
+    GLCall(glGetProgramiv(m_RendererID, GL_ACTIVE_UNIFORM_BLOCKS, &blockCount));
+
+    for (int i = 0; i < blockCount; i++)
+    {
+        int nameLength;
+        GLCall(glGetActiveUniformBlockiv(m_RendererID, i, GL_UNIFORM_BLOCK_NAME_LENGTH, &nameLength));
+        std::unique_ptr<char> ch = std::make_unique<char>();
+        std::vector<GLchar> name;
+        name.resize(nameLength);
+        GLCall(glGetActiveUniformBlockName(m_RendererID, i, nameLength, NULL, &name[0]));
+        const char* blockName = std::string(name.begin(), name.end() - 1).c_str();
+
+        if (blockName == ViewProjection::GetName())
+        {
+            SetUniformBindingPoint(ViewProjection::GetName(), ViewProjection::slot);
+        }
+    }
 }
 
 MaterialUniformLayout Shader::GetMaterialUniforms()

@@ -14,9 +14,11 @@ out vec3 fNormal;
 
 uniform mat4 model;
 
+uniform int tester;
+
 void main()
 {
-    gl_Position = viewProjection.projection * viewProjection.view * model * vec4(aPos, 1.0 + tester);
+    gl_Position = viewProjection.projection * viewProjection.view * model * vec4(aPos, 1.0);
     fUV = aUV;
     fNormal = aNormal;
 }

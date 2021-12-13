@@ -9,25 +9,14 @@ void SceneView::Render(float deltaTime)
 	m_VP->projection = m_Camera->GetProjectionMatrix();
 	m_UniformBuffer->UpdateData(m_VP.get());
 
-	m_Object->Render();
-
-	//m_FrameBuffer->Unbind();
-
-	//ImGui::Begin("Scene");
-
-	//ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-	//m_Size = { viewportPanelSize.x, viewportPanelSize.y };
-
-	m_Camera->SetAspectRatio(m_Size.x / m_Size.y);
-
-	//// add rendered texture to ImGUI scene window
-	//uint64_t textureID = m_FrameBuffer->GetTexture();
-	//ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2{ m_Size.x, m_Size.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
-
-	//ImGui::End();
+	for (int i = 0; i < m_Scene->m_Objects.size(); i++)
+	{
+		m_Scene->m_Objects[i]->Render();
+	}
 
 	if (CameraMovable)
 	{
+		m_Camera->SetAspectRatio(m_Size.x / m_Size.y);
 		m_Camera->Update(deltaTime);
 	}
 }
@@ -38,5 +27,4 @@ void SceneView::OnResize(int width, int height)
 	m_Size.y = (float)height;
 
 	m_Camera->SetAspectRatio(m_Size.x / m_Size.y);
-	//m_FrameBuffer->GenerateBuffers((int)m_Size.x, (int)m_Size.y);
 }

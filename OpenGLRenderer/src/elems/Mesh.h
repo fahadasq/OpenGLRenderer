@@ -27,7 +27,7 @@ public:
 
 	void CreateBuffers();
 	void DeleteBuffers();
-	void Bind() const;
+	void Bind();
 
 	unsigned int IndexCount;
 

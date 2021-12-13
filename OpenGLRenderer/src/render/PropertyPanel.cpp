@@ -5,68 +5,67 @@
 
 void PropertyPanel::Render(SceneView* m_Sceneview)
 {
-    ImGui::Begin("Window");
-    ImGui::Text("Hello World!");
+    ImGui::Begin("Hierarchy");
 
     ImGuiIO& io = ImGui::GetIO();
-
-    // open Dialog Simple
-    if (ImGui::Button("Set Mesh"))
-        ImGuiFileDialog::Instance()->OpenDialog("SetMesh", "Choose File", ".obj", ".");
-
-    // display
-    if (ImGuiFileDialog::Instance()->Display("SetMesh"))
+    
+    if (ImGui::Button("Create Object"))
     {
-        // action if OK
-        if (ImGuiFileDialog::Instance()->IsOk())
+        m_Sceneview->m_Scene->CreateObject();
+    }
+
+    for (int i = 0; i < m_Sceneview->m_Scene->m_Objects.size(); i++)
+    {
+        std::stringstream label;
+        const uint64_t id = m_Sceneview->m_Scene->m_Objects[i]->GetID();
+        label << m_Sceneview->m_Scene->m_Objects[i]->m_Name << id;
+
+        ImGuiTreeNodeFlags flags = ((m_Sceneview->m_SelectedObject == m_Sceneview->m_Scene->m_Objects[i]) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
+        bool opened = ImGui::TreeNodeEx((void*)m_Sceneview->m_Scene->m_Objects[i].get(), flags, label.str().c_str());
+
+        if (ImGui::IsItemClicked())
         {
-            std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-            std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
-            m_SetMeshCallback(filePathName);
+            m_Sceneview->m_SelectedObject = m_Sceneview->m_Scene->m_Objects[i];
         }
-
-        // close
-        ImGuiFileDialog::Instance()->Close();
     }
 
+    ImGui::End();
 
-    char* buffer = m_Sceneview->m_Object->m_Material->m_UniformBuffer;
-    for (Uniform uniform : m_Sceneview->m_Object->m_Material->m_MaterialType->m_UniformLayout->uniforms)
+    ImGui::Begin("Properties");
+
+    if (m_Sceneview->m_SelectedObject)
     {
-        DisplayUniformVariable(buffer, uniform);
+        std::stringstream label;
+        label << "Selected Object: "<< m_Sceneview->m_SelectedObject->m_Name << m_Sceneview->m_SelectedObject->GetID();
+        ImGui::Text(label.str().c_str());
+        DisplayObjectInfo(m_Sceneview->m_SelectedObject.get());
     }
-    for (int i = 0; i < m_Sceneview->m_Object->m_Material->m_MaterialType->m_UniformLayout->texUniforms.size(); i++)
-    {
-        DisplayTextureUniform(m_Sceneview->m_Object->m_Material->m_MaterialType->m_UniformLayout->texUniforms[i]);
-    }
-
-    ImGui::DragFloat3("Position", &m_Sceneview->m_Object->m_Transform.m_Position.x);
-    ImGui::DragFloat3("Rotation", &m_Sceneview->m_Object->m_Transform.m_Rotation.x);
-    ImGui::DragFloat3("Scale", &m_Sceneview->m_Object->m_Transform.m_Scale.x);    
-    m_Sceneview->m_Object->m_Material->SetUniforms();
-
+    
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
     ImGui::End();
 }
 
 void PropertyPanel::DisplayUniformVariable(char* buffer, Uniform& uniform)
 {
+    std::string name = uniform.name;
+    name = name.substr(name.find(".") + 1);
+
     switch (uniform.type)
     {
     case GL_FLOAT:
-        ImGui::InputFloat(uniform.name.c_str(), (float*)&buffer[uniform.offset]);
+        ImGui::InputFloat(name.c_str(), (float*)&buffer[uniform.offset]);
         break;
     case GL_FLOAT_VEC2:
-        ImGui::InputFloat2(uniform.name.c_str(), (float*)&buffer[uniform.offset]);
+        ImGui::InputFloat2(name.c_str(), (float*)&buffer[uniform.offset]);
         break;
     case GL_FLOAT_VEC3:
-        ImGui::ColorEdit3(uniform.name.c_str(), (float*)&buffer[uniform.offset]);
+        ImGui::ColorEdit3(name.c_str(), (float*)&buffer[uniform.offset]);
         break;
     case GL_FLOAT_VEC4:
-        ImGui::InputFloat4(uniform.name.c_str(), (float*)&buffer[uniform.offset]);
+        ImGui::InputFloat4(name.c_str(), (float*)&buffer[uniform.offset]);
         break;
     case GL_INT:
-        ImGui::InputInt(uniform.name.c_str(), (int*)&buffer[uniform.offset]);
+        ImGui::InputInt(name.c_str(), (int*)&buffer[uniform.offset]);
         break;
     }
 }
@@ -74,7 +73,10 @@ void PropertyPanel::DisplayUniformVariable(char* buffer, Uniform& uniform)
 void PropertyPanel::DisplayTextureUniform(TextureUniform& uniform)
 {
     // open Dialog Simple
-    if (ImGui::Button(uniform.name.c_str()))
+    std::string name = uniform.name;
+    name = name.substr(name.find(".") +1);
+
+    if (ImGui::Button(name.c_str()))
         ImGuiFileDialog::Instance()->OpenDialog("SetTexture", "Choose File", ".jpg,.jpeg,.png", ".");
 
     // display
@@ -91,6 +93,60 @@ void PropertyPanel::DisplayTextureUniform(TextureUniform& uniform)
         // close
         ImGuiFileDialog::Instance()->Close();
     }
+}
+
+void PropertyPanel::DisplayObjectInfo(GameObject* object)
+{   
+        if (ImGui::CollapsingHeader("Transform"))
+        {
+            ImGui::DragFloat3("Position", &object->m_Transform.m_Position.x);
+            ImGui::DragFloat3("Rotation", &object->m_Transform.m_Rotation.x);
+            ImGui::DragFloat3("Scale", &object->m_Transform.m_Scale.x);
+        }
+
+        if (ImGui::CollapsingHeader("Mesh"))
+        {
+            // open Dialog Simple
+            if (ImGui::Button("Open..."))
+                ImGuiFileDialog::Instance()->OpenDialog("SetMesh", "Choose File", ".obj", ".");
+
+
+            // display
+            if (ImGuiFileDialog::Instance()->Display("SetMesh"))
+            {
+                // action if OK
+                if (ImGuiFileDialog::Instance()->IsOk())
+                {
+                    std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+                    std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+                    object->SetMesh(filePathName.c_str());
+                }
+
+                // close
+                ImGuiFileDialog::Instance()->Close();
+            }
+
+            ImGui::Spacing();
+        }
+
+
+        if (ImGui::CollapsingHeader("Material"))
+        {
+            char* buffer = object->m_Material->m_UniformBuffer;
+            for (Uniform uniform : object->m_Material->m_MaterialType->m_UniformLayout->uniforms)
+            {
+                DisplayUniformVariable(buffer, uniform);
+            }
+            for (size_t i = 0; i < object->m_Material->m_MaterialType->m_UniformLayout->texUniforms.size(); i++)
+            {
+                DisplayTextureUniform(object->m_Material->m_MaterialType->m_UniformLayout->texUniforms[i]);
+            }
+
+            
+            object->m_Material->SetUniforms();
+        }
+
+    
 }
 
 

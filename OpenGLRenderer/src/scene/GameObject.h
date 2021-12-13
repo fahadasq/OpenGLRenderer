@@ -1,16 +1,19 @@
 #pragma once
 
-#include "MaterialInstance.h"
-#include "Mesh.h"
-#include "Transform.h"
+#include "elems/MaterialInstance.h"
+#include "elems/Mesh.h"
+#include "elems/Transform.h"
+#include <UUID.h>
 
 class GameObject
 {
 private:
+	UUID m_UUID;
 public:
 	Transform m_Transform;
 	std::shared_ptr<Mesh> m_Mesh;
 	std::unique_ptr<MaterialInstance> m_Material;
+	std::string m_Name;
 	GameObject();
 	GameObject(const char* meshFilePath);
 	GameObject(const char* vFilePath, const char* fFilePath, const char* gFilePath = nullptr);
@@ -25,6 +28,8 @@ public:
 	void Render();
 
 	void SetUniform(const char* name, const glm::mat4& value);
-	void SetUniformBindingPoint(const char* name, unsigned int index);
+	void BindUniformBlocks();
+
+	const uint64_t GetID() const { return m_UUID; }
 };
 

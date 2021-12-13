@@ -6,6 +6,10 @@ MaterialInstance::MaterialInstance(const char* vShaderFile, const char* fShaderF
 {
 	m_MaterialType = ResourceManager::GetMaterial(vShaderFile, fShaderFile, gShaderFile);
 	m_UniformBuffer = new char[m_MaterialType->m_BufferSize];
+	for (Uniform i : m_MaterialType->m_UniformLayout->uniforms)
+	{
+		Uniform::SetDefaultValue(&m_UniformBuffer[i.offset], i.type);
+	}
 }
 
 MaterialInstance::~MaterialInstance()
