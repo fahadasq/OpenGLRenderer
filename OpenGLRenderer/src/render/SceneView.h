@@ -26,6 +26,10 @@ private:
 	std::unique_ptr<FrameBuffer> m_FrameBuffer;
 	glm::vec2 m_Size;
 
+	GLFWwindow* m_Window;
+
+	bool m_MouseHovered;
+
 public:
 	std::weak_ptr<GameObject> m_SelectedObject;
 	std::unique_ptr<Scene> m_Scene;
@@ -61,5 +65,15 @@ public:
 		m_Camera->OnScroll(deltaTime, scroll);
 	}
 
+	void SetWindow(GLFWwindow* window)
+	{
+		m_Window = window;
+	}
+	GLFWwindow* GetWindow()
+	{
+		return m_Window;
+	}
+
+	const bool& IsMouseHovered() const { return m_MouseHovered; }
 	bool CameraMovable = false;
 };

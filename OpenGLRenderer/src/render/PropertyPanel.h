@@ -6,11 +6,11 @@
 #include "panels/InspectorPanel.h"
 #include <functional>
 
-class PropertyPanel
+class EditorView
 {
 public:
 
-	PropertyPanel()
+	EditorView()
 	{
 		m_InspectorPanel = std::make_unique<InspectorPanel>();
 		m_HierarchyPanel = std::make_unique<SceneHierarchyPanel>();

@@ -17,6 +17,9 @@ void SceneView::Render(float deltaTime)
 
 	ImGui::Begin("Scene");
 
+	
+	m_MouseHovered = ImGui::IsWindowHovered();
+
 	ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 	m_Size = { viewportPanelSize.x, viewportPanelSize.y };
 

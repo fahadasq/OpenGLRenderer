@@ -5,20 +5,22 @@
 #include <window/GLWindow.h>
 
 
-class Application
+static class Application
 {
 public:
 
-	Application(const std::string& app_name);
 
 	static Application& Instance() { return *s_Instance; }
 
-	void Loop();
+	static void Init(const std::string& app_name);
+	static void Loop();
 
+	static GLFWwindow* GetNativeWindow();
 
 private:
+	static std::unique_ptr<GLWindow> m_Window;
+	Application() { }
 
 	static Application* s_Instance;
 
-	std::unique_ptr<GLWindow> m_Window;
 };

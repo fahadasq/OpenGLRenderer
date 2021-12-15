@@ -12,9 +12,9 @@ public:
 	void Render();
 
 	void AddObject(std::shared_ptr<GameObject>& object);
-	void CreateObject();
+	void CreateObject(bool empty = false);
 	void RemoveObject(int index);
-	void RemoveObject(UUID id);
+	void RemoveObject(UniversallyUniqueID id);
 
 	const std::vector<std::shared_ptr<GameObject>>& GetObjects() const { return m_Objects; }
 };

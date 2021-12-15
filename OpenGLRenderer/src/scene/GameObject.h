@@ -8,7 +8,7 @@
 class GameObject
 {
 private:
-	UUID m_UUID;
+	UniversallyUniqueID m_UUID;
 	Transform m_Transform;
 	std::shared_ptr<Mesh> m_Mesh;
 	std::unique_ptr<MaterialInstance> m_Material;
@@ -32,10 +32,10 @@ public:
 	void BindUniformBlocks();
 
 	Transform& GetTransform() { return m_Transform; }
-	MaterialInstance* GetMaterial() const { return m_Material.get(); }
+	MaterialInstance* GetMaterial() const { return ((m_Material) ? m_Material.get() : nullptr); }
 
 	const uint64_t& GetID() const { return m_UUID; }
-	const std::shared_ptr<Mesh>& GetMesh() const { return m_Mesh; }
+	const std::shared_ptr<Mesh>& GetMesh() const { return ((m_Mesh) ? m_Mesh : nullptr); }
 	const std::string& GetName() const { return m_Name; }
 };
 

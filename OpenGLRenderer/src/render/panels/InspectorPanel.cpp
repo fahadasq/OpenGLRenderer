@@ -1,18 +1,21 @@
 #include "pch.h"
 #include "InspectorPanel.h"
 #include <3rdparty/imguifiledialog/ImGuiFileDialog.h>
+#include <utils/WindowPlatformUtils.h>
 
 InspectorPanel::InspectorPanel()
-{
+{ 
+
 }
 
 void InspectorPanel::Render(SceneView* m_Sceneview)
 {
     ImGui::Begin("Properties");
 
+
     if (!m_Sceneview->m_SelectedObject.expired())
     {
-        std::stringstream label;        
+        std::stringstream label;
         label << "Selected Object: " << m_Sceneview->m_SelectedObject.lock()->GetName();
         ImGui::Text(label.str().c_str());
 
@@ -21,7 +24,7 @@ void InspectorPanel::Render(SceneView* m_Sceneview)
         id << "Object ID: " << m_Sceneview->m_SelectedObject.lock()->GetID();
         ImGui::Text(id.str().c_str());
 
-        DisplayObjectInfo(m_Sceneview->m_SelectedObject.lock().get());
+        DisplayObjectInfo(m_Sceneview->m_SelectedObject.lock().get(), m_Sceneview);
     }
 }
 
@@ -75,10 +78,11 @@ void InspectorPanel::DisplayTextureUniform(TextureUniform& uniform)
     }
 }
 
-void InspectorPanel::DisplayObjectInfo(GameObject* object)
+void InspectorPanel::DisplayObjectInfo(GameObject* object, SceneView* m_Sceneview)
 {
     if (ImGui::CollapsingHeader("Transform"))
     {
+        ImGui::Spacing();
         Transform& transformRef = object->GetTransform();
         ImGui::DragFloat3("Position", &transformRef.m_Position.x, 0.25f);
         ImGui::DragFloat3("Rotation", &transformRef.m_Rotation.x, 0.25f);
@@ -90,34 +94,43 @@ void InspectorPanel::DisplayObjectInfo(GameObject* object)
 
     if (ImGui::CollapsingHeader("Mesh"))
     {
+        ImGui::Spacing();
         // open Dialog Simple
         if (ImGui::Button("Open..."))
-            ImGuiFileDialog::Instance()->OpenDialog("SetMesh", "Choose File", ".obj", ".");
-
-
-        // display
-        if (ImGuiFileDialog::Instance()->Display("SetMesh"))
         {
-            // action if OK
-            if (ImGuiFileDialog::Instance()->IsOk())
+            std::string filePath = WindowFileDialog::OpenFile(".obj");
+            if (!filePath.empty())
             {
-                std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-                std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
-                object->SetMesh(filePathName.c_str());
+                object->SetMesh(filePath.c_str());
             }
-
-            // close
-            ImGuiFileDialog::Instance()->Close();
+            //ImGuiFileDialog::Instance()->OpenDialog("SetMesh", "Choose File", ".obj", ".");
         }
 
-        ImGui::Spacing();
+        //// display
+        //if (ImGuiFileDialog::Instance()->Display("SetMesh"))
+        //{
+        //    // action if OK
+        //    if (ImGuiFileDialog::Instance()->IsOk())
+        //    {
+        //        std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+        //        std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+        //        object->SetMesh(filePathName.c_str());
+        //    }
+
+        //    // close
+        //    ImGuiFileDialog::Instance()->Close();
+        //}
+
+        //ImGui::Spacing();
     }
 
     ImGui::Spacing();
 
-    if (ImGui::CollapsingHeader("Material"))
+    MaterialInstance* material = object->GetMaterial();
+
+    if (ImGui::CollapsingHeader("Material") && material)
     {
-        MaterialInstance* material = object->GetMaterial();
+        ImGui::Spacing();
         char* buffer = material->m_UniformBuffer;
         std::shared_ptr<MaterialUniformLayout> uniformLayout = material->GetMaterialType()->GetUniformLayout();
         for (Uniform uniform : uniformLayout->uniforms)

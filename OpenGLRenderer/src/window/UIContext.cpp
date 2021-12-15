@@ -79,6 +79,8 @@ void UIContext::PreRender()
 
     ImGuiID dockSpaceId = ImGui::GetID("InvisibleWindowDockSpace");
 
+    
+
     ImGui::DockSpace(dockSpaceId, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
     ImGui::End();
 }

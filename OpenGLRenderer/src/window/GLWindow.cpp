@@ -13,7 +13,8 @@ bool GLWindow::Init(int width, int height, const std::string& title)
 	m_UICtxt->Init(this);
 
 	m_SceneView = std::make_unique<SceneView>(deltaTime);
-	m_PropertyPanel = std::make_unique<PropertyPanel>();
+	m_SceneView->SetWindow((GLFWwindow*)GetNativeWindow());
+	m_EditorView = std::make_unique<EditorView>();
 
 	return true;
 }
@@ -35,7 +36,7 @@ void GLWindow::Render()
 
 
 	m_SceneView->Render(deltaTime);
-	m_PropertyPanel->Render(m_SceneView.get());
+	m_EditorView->Render(m_SceneView.get());
 
 	m_UICtxt->PostRender();
 	m_RenderCtxt->PostRender();
@@ -56,7 +57,7 @@ void GLWindow::HandleInput()
 	Input::MouseCallback(xpos, ypos);
 
 
-	if (Input::GetPressedButton((GLFWwindow*)GetNativeWindow()) == EInputButton::Right && !m_SceneView->CameraMovable)
+	if (Input::GetPressedButton((GLFWwindow*)GetNativeWindow()) == EInputButton::Right && !m_SceneView->CameraMovable && m_SceneView->IsMouseHovered())
 	{
 		m_SceneView->CameraMovable = true;
 		glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);

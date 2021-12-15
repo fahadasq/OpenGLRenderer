@@ -44,16 +44,21 @@ void GameObject::SetMesh(const char* meshFilePath)
 
 void GameObject::Bind()
 {
+	if (m_Material)
 	m_Material->Bind();
+	if (m_Mesh)
 	m_Mesh->Bind();
 }
 
 void GameObject::Render()
 {
-	Bind();
-	m_Transform.Update();
-	SetUniform("model", m_Transform.GetModel());
-	GLCall(glDrawElements(GL_TRIANGLES, m_Mesh->IndexCount, GL_UNSIGNED_INT, 0));
+	if (m_Material && m_Mesh)
+	{
+		Bind();
+		m_Transform.Update();
+		SetUniform("model", m_Transform.GetModel());
+		GLCall(glDrawElements(GL_TRIANGLES, m_Mesh->IndexCount, GL_UNSIGNED_INT, 0));
+	}
 }
 
 void GameObject::SetUniform(const char* name, const glm::mat4& value)

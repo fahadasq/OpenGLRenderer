@@ -22,7 +22,7 @@ private:
 	std::unique_ptr<UIContext> m_UICtxt;
 
 	std::unique_ptr<SceneView> m_SceneView;
-	std::unique_ptr<PropertyPanel> m_PropertyPanel;
+	std::unique_ptr<EditorView> m_EditorView;
 
 public:
 

@@ -7,9 +7,9 @@
 
 int main()
 {
-    auto app = std::make_unique<Application>("LearnOpenGL");
+    Application::Init("OpenGLRenderer");
 
-    app->Loop();
+    Application::Loop();
 
     return 0;
 }

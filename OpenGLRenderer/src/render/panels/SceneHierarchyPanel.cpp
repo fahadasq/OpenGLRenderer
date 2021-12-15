@@ -12,11 +12,36 @@ void SceneHierarchyPanel::Render(SceneView* m_Sceneview)
 {
     ImGui::Begin("Hierarchy");
 
-
-    if (ImGui::Button("Create Object"))
+    if (ImGui::BeginMenuBar())
     {
-        m_Sceneview->m_Scene->CreateObject();
+        if (ImGui::BeginMenu("File"))
+        {
+            if (ImGui::MenuItem("Bruh"))
+            {
+            }
+            ImGui::EndMenu();
+        }
+    ImGui::EndMenuBar();
     }
+
+    uint64_t selectedID = 0;
+
+    if (ImGui::BeginPopupContextWindow())
+    {
+        if (ImGui::MenuItem("Default Object"))
+        {
+            m_Sceneview->m_Scene->CreateObject();
+        }
+
+        if (ImGui::MenuItem("Empty Object"))
+        {
+            m_Sceneview->m_Scene->CreateObject(true);
+        }
+
+        ImGui::EndPopup();
+    }
+
+    
     
     auto& objects = m_Sceneview->m_Scene->GetObjects();
 
@@ -31,11 +56,28 @@ void SceneHierarchyPanel::Render(SceneView* m_Sceneview)
         ImGuiTreeNodeFlags flags = ((selectedObjExists) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
         bool opened = ImGui::TreeNodeEx((void*)objects[i].get(), flags, label.str().c_str());
 
-        if (ImGui::IsItemClicked())
+        if (ImGui::IsItemClicked(0))
         {
             m_Sceneview->m_SelectedObject = objects[i];
+            selectedID = id;
         }
+
+        ImGui::OpenPopupOnItemClick("SelectedItem", ImGuiPopupFlags_MouseButtonRight);
+    
+        
+
     }
+
+    if (ImGui::BeginPopupContextItem("SelectedItem"))
+    {
+        if (ImGui::MenuItem("Delete Object"))
+        {
+            m_Sceneview->m_Scene->RemoveObject(selectedID);
+        }
+
+        ImGui::EndPopup();
+    }
+    
 
     ImGui::End();
 }

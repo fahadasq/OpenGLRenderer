@@ -1,6 +1,7 @@
 #include <pch.h>
 #include "Material.h"
 #include <ResourceManager.h>
+#include <yaml-cpp/yaml.h>
 
 Material::Material()
 	: m_Shader(nullptr), m_UniformLayout(nullptr), m_BufferSize(0)
