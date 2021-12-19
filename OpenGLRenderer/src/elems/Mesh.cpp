@@ -6,7 +6,10 @@
 #include <assimp/scene.h>
 
 Mesh::Mesh()
-{
+{    
+    m_UUID = UniversallyUniqueID();
+    m_SourceFilePath = std::string();
+    m_Type = AssetType::Mesh;
     m_VertexBuffer = std::make_unique<VertexBuffer>();
     m_IndexBuffer = std::make_unique<IndexBuffer>();
     m_BufferLayout = std::make_unique<VertexBufferLayout>();
@@ -57,8 +60,17 @@ void Mesh::Bind()
     IndexCount = m_IndexBuffer->GetCount();
 }
 
-void Mesh::Load(const std::string& filepath)
+void Mesh::SetAsset(const char* filePath)
 {
+    //m_UUID = UniversallyUniqueID();
+    m_SourceFilePath = std::string(filePath);
+}
+
+void Mesh::Load(const std::string filepath)
+{
+    m_SourceFilePath = filepath;
+
+
     const unsigned int cMeshImportFlags =
         aiProcess_CalcTangentSpace |
         aiProcess_Triangulate |
@@ -103,4 +115,15 @@ void Mesh::Load(const std::string& filepath)
 
         CreateBuffers();
     }
+}
+
+void Mesh::Serialize(const std::string& filepath)
+{
+    __super::Serialize(filepath.c_str());
+}
+
+void Mesh::Deserialize(const std::string& filepath)
+{
+    __super::Deserialize(filepath.c_str());
+    Load(m_SourceFilePath);
 }

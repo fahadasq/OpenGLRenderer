@@ -1,162 +1,173 @@
 #include "pch.h"
 #include "ResourceManager.h"
+#include <ErrorHandler.h>
 
-std::unordered_map<ShaderSpecs, std::weak_ptr<Shader>, hash_fn> ResourceManager::m_Shaders;
-std::unordered_map<ShaderSpecs, std::weak_ptr<MaterialUniformLayout>, hash_fn> ResourceManager::m_UniformLayouts;
-std::unordered_map<ShaderSpecs, std::weak_ptr<Material>, hash_fn> ResourceManager::m_Materials;
-std::unordered_map<std::string, std::weak_ptr<Texture2D>> ResourceManager::m_Textures;
-std::unordered_map<std::string, std::weak_ptr<Mesh>> ResourceManager::m_Meshes;
+std::unordered_map<uint64_t, Asset> ResourceManager::m_AssetRepository;
+std::unordered_map<uint64_t, ShaderAsset> ResourceManager::m_ShaderAssetRepository;
 
-// returns true if the texture at specified filepath exists in memory
-bool ResourceManager::CheckTextureExists(const char* filePath)
+std::unordered_map<uint64_t, std::weak_ptr<Shader>> ResourceManager::m_LoadedShaders;
+std::unordered_map<uint64_t, std::weak_ptr<Texture2D>> ResourceManager::m_LoadedTextures;
+std::unordered_map<uint64_t, std::weak_ptr<Material>> ResourceManager::m_LoadedMaterials;
+std::unordered_map<uint64_t, std::weak_ptr<Mesh>> ResourceManager::m_LoadedMeshes;
+
+std::shared_ptr<Shader> ResourceManager::GetShader(const char* filepath)
 {
-	return !m_Textures[filePath].expired();
-}
+	uint64_t ID = ShaderAsset::DeserializeID(filepath);
 
-bool ResourceManager::CheckMeshExists(const char* filePath)
-{
-	return !m_Meshes[filePath].expired();
-}
-
-// returns true if a shader program composed from shaders at the specified filepaths exists in memory
-bool ResourceManager::CheckShaderExists(const char* vShaderFile, const char* fShaderFile, const char* gShaderFile)
-{
-	return !m_Shaders[{ vShaderFile, fShaderFile, gShaderFile }].expired();
-}
-
-// returns true if a shader program composed from shaders at the specified filepaths exists in memory
-bool ResourceManager::CheckShaderExists(ShaderSpecs specs)
-{
-	return !m_Shaders[specs].expired();
-}
-
-std::shared_ptr<Shader> ResourceManager::GetShader(const char* vShaderFile, const char* fShaderFile, const char* gShaderFile)
-{
-	ShaderSpecs specs(vShaderFile, fShaderFile, gShaderFile);
-	if (m_Shaders.find(specs) != m_Shaders.end())
+	if (m_ShaderAssetRepository.find(ID) != m_ShaderAssetRepository.end())
 	{
-		if (!m_Shaders[specs].expired())
+		if (m_LoadedShaders.find(ID) != m_LoadedShaders.end() && !m_LoadedShaders[ID].expired())
 		{
-			return m_Shaders[specs].lock();
+			return m_LoadedShaders[ID].lock();
+		}
+		else
+		{
+			ShaderAsset asset = m_ShaderAssetRepository[ID];
+			std::shared_ptr<Shader> shader = std::make_shared<Shader>(asset);
+			m_LoadedShaders[ID] = shader;
+			return shader;
 		}
 	}
 
+	ShaderAsset asset;	
+	asset.Deserialize(filepath);
+	std::cout << "File Path: " << filepath << "\n";
+	std::cout << "Shader Asset Vertex: " << asset.GetVertSourcePath() << "\n";
+	std::shared_ptr<Shader> shader = std::make_shared<Shader>(asset);
+	m_LoadedShaders[ID] = shader;
+	return shader;
+}
+
+std::shared_ptr<Material> ResourceManager::GetMaterial(const char* filepath)
+{
+	uint64_t ID = Asset::DeserializeID(filepath);
+
+	if (m_AssetRepository.find(ID) != m_AssetRepository.end())
+	{
+		if (m_LoadedMaterials.find(ID) != m_LoadedMaterials.end() && !m_LoadedMaterials[ID].expired())
+		{
+			return m_LoadedMaterials[ID].lock();
+		}
+		else
+		{
+			Asset asset = m_AssetRepository[ID];
+			std::shared_ptr<Material> material = std::make_shared<Material>(asset);
+			m_LoadedMaterials[ID] = material;
+			return material;
+		}
+	}
+
+	Asset asset;
+	asset.Deserialize(filepath);
+	std::shared_ptr<Material> material = std::make_shared<Material>(asset);
+	m_LoadedMaterials[ID] = material;
+	return material;
+}
+
+std::shared_ptr<Texture2D> ResourceManager::GetTexture(const char* filepath)
+{
+	uint64_t ID = Asset::DeserializeID(filepath);
+
+	if (m_AssetRepository.find(ID) != m_AssetRepository.end())
+	{
+		if (m_LoadedTextures.find(ID) != m_LoadedTextures.end() && !m_LoadedTextures[ID].expired())
+		{
+			return m_LoadedTextures[ID].lock();
+		}
+		else
+		{
+			Asset asset = m_AssetRepository[ID];
+			std::shared_ptr<Texture2D> texture = std::make_shared<Texture2D>();
+			texture->LoadTextureFromFile(asset.GetSourcePath().c_str());
+			m_LoadedTextures[ID] = texture;
+			return texture;
+		}
+	}
+
+	Asset asset;
+	asset.Deserialize(filepath);
+	m_AssetRepository[ID] = asset;
+	std::shared_ptr<Texture2D> tex = std::make_shared<Texture2D>();
+	tex->LoadTextureFromFile(asset.GetSourcePath().c_str());
+	m_LoadedTextures[ID] = tex;
+	return tex;
+}
+
+std::shared_ptr<Mesh> ResourceManager::GetMesh(const char* filepath)
+{
+	uint64_t ID = Asset::DeserializeID(filepath);
+
+	if (m_AssetRepository.find(ID) != m_AssetRepository.end())
+	{
+		if (m_LoadedMeshes.find(ID) != m_LoadedMeshes.end() && !m_LoadedMeshes[ID].expired())
+		{
+			return m_LoadedMeshes[ID].lock();
+		}
+		else
+		{
+			Asset asset = m_AssetRepository[ID];
+			std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>();
+			mesh->Load(asset.GetSourcePath());
+			m_LoadedMeshes[ID] = mesh;
+			return mesh;
+		}
+	}
 	
-	std::shared_ptr<Shader> shader = std::make_shared<Shader>();
-	shader->LoadShader(vShaderFile, fShaderFile, gShaderFile);
-	m_Shaders[specs] = shader;
-	return shader;
-}
-
-std::shared_ptr<Shader> ResourceManager::GetShader(ShaderSpecs specs)
-{
-	if (m_Shaders.find(specs) != m_Shaders.end() && !m_Shaders[specs].expired())
-	{
-		return m_Shaders[specs].lock();
-	}
-
-	std::shared_ptr<Shader> shader = std::make_shared<Shader>();
-	shader->LoadShader(specs.vShaderFile, specs.vShaderFile, specs.gShaderFile);
-	m_Shaders[specs] = shader;
-	return shader;
-}
-
-std::shared_ptr<MaterialUniformLayout> ResourceManager::GetUniformLayout(const char* vShaderFile, const char* fShaderFile, const char* gShaderFile)
-{
-	ShaderSpecs specs(vShaderFile, fShaderFile, gShaderFile);
-	if (m_UniformLayouts.find(specs) != m_UniformLayouts.end())
-	{
-		if (!m_UniformLayouts[specs].expired())
-		{
-			return m_UniformLayouts[specs].lock();
-		}
-	}
-
-
-	std::shared_ptr<Shader> shader = ResourceManager::GetShader(vShaderFile, fShaderFile, gShaderFile);
-	std::shared_ptr<MaterialUniformLayout> uniformLayout = std::make_shared<MaterialUniformLayout>();
-	MaterialUniformLayout shaderLayout = shader->GetMaterialUniforms();
-	uniformLayout->uniforms = shaderLayout.uniforms;
-	uniformLayout->texUniforms = shaderLayout.texUniforms;
-	m_UniformLayouts[specs] = uniformLayout;
-	return uniformLayout;
-}
-
-std::shared_ptr<MaterialUniformLayout> ResourceManager::GetUniformLayout(ShaderSpecs specs)
-{
-	if (m_UniformLayouts.find(specs) != m_UniformLayouts.end())
-	{
-		if (!m_UniformLayouts[specs].expired())
-		{
-			return m_UniformLayouts[specs].lock();
-		}
-	}
-
-
-	std::shared_ptr<Shader> shader = ResourceManager::GetShader(specs);
-	std::shared_ptr<MaterialUniformLayout> uniformLayout = std::make_shared<MaterialUniformLayout>();
-	MaterialUniformLayout shaderLayout = shader->GetMaterialUniforms();
-	uniformLayout->uniforms = shaderLayout.uniforms;
-	uniformLayout->texUniforms = shaderLayout.texUniforms;
-	m_UniformLayouts[specs] = uniformLayout;
-	return uniformLayout;
-}
-
-std::shared_ptr<Material> ResourceManager::GetMaterial(const char* vShaderFile, const char* fShaderFile, const char* gShaderFile)
-{
-	ShaderSpecs specs(vShaderFile, fShaderFile, gShaderFile);
-	if (m_Materials.find(specs) != m_Materials.end())
-	{
-		if (!m_Materials[specs].expired())
-		{
-			return m_Materials[specs].lock();
-		}
-	}
-
-
-	std::shared_ptr<Material> material = std::make_shared<Material>(vShaderFile, fShaderFile, gShaderFile);
-	m_Materials[specs] = material;
-	return material;
-}
-
-std::shared_ptr<Material> ResourceManager::GetMaterial(ShaderSpecs specs)
-{
-	if (m_Materials.find(specs) != m_Materials.end())
-	{
-		if (!m_Materials[specs].expired())
-		{
-			return m_Materials[specs].lock();
-		}
-	}
-
-
-	std::shared_ptr<Material> material = std::make_shared<Material>(specs.vShaderFile, specs.fShaderFile, specs.gShaderFile);
-	m_Materials[specs] = material;
-	return material;
-}
-
-std::shared_ptr<Texture2D> ResourceManager::GetTexture(const char* filePath)
-{
-	if (m_Textures.find(filePath) != m_Textures.end() && !m_Textures[filePath].expired())
-	{
-		return m_Textures[filePath].lock();
-	}
-
-	std::shared_ptr<Texture2D> texture = std::make_shared<Texture2D>();
-	texture->LoadTextureFromFile(filePath);
-	m_Textures[filePath] = texture;
-	return texture;
-}
-
-std::shared_ptr<Mesh> ResourceManager::GetMesh(const char* filePath)
-{
-	if (m_Meshes.find(filePath) != m_Meshes.end() && !m_Meshes[filePath].expired())
-	{
-		return m_Meshes[filePath].lock();
-	}
-
+	Asset asset;
+	asset.Deserialize(filepath);
+	m_AssetRepository[ID] = asset;
 	std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>();
-	mesh->Load(filePath);
-	m_Meshes[filePath] = mesh;
+	mesh->Load(asset.GetSourcePath());
+	m_LoadedMeshes[ID] = mesh;
 	return mesh;
+}
+
+const Asset ResourceManager::AddAsset(const char* filePath)
+{
+	Asset asset(filePath);
+	uint64_t id = asset.GetID();
+	m_AssetRepository[id] = asset;
+	return asset;
+}
+
+const Asset ResourceManager::AddAsset(Asset asset)
+{
+	uint64_t id = asset.GetID();
+	m_AssetRepository[id] = asset;
+	return asset;
+}
+
+const Asset ResourceManager::GetAsset(uint64_t ID)
+{
+	return (m_AssetRepository.find(ID) != m_AssetRepository.end()) ? m_AssetRepository[ID] : Asset();
+}
+
+void ResourceManager::SerializeAsset(Asset& asset, const char* filePath)
+{
+	asset.Serialize(filePath);
+}
+
+const ShaderAsset ResourceManager::AddShaderAsset(const char* vFilepath, const char* fFilepath, const char* gFilepath)
+{
+	ShaderAsset asset(vFilepath, fFilepath, gFilepath);
+	uint64_t id = asset.GetID();
+	m_ShaderAssetRepository[id] = asset;
+	return asset;
+}
+
+const ShaderAsset ResourceManager::AddShaderAsset(ShaderAsset asset)
+{
+	uint64_t id = asset.GetID();
+	m_ShaderAssetRepository[id] = asset;
+	return asset;
+}
+
+const ShaderAsset ResourceManager::GetShaderAsset(uint64_t ID)
+{
+	return (m_ShaderAssetRepository.find(ID) != m_ShaderAssetRepository.end()) ? m_ShaderAssetRepository[ID] : ShaderAsset();
+}
+
+void ResourceManager::SerializeAsset(ShaderAsset& asset, const char* filePath)
+{
+	asset.Serialize(filePath);
 }

@@ -1,4 +1,5 @@
 #include "pch.h"
+
 #include "Transform.h"
 
 Transform::Transform()
@@ -10,7 +11,8 @@ Transform::Transform(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
 	: m_Position(position), m_Rotation(rotation), m_Scale(scale)
 {
 	glm::mat4 model(1.0f);
-	model = glm::translate(model, m_Position);
+	model = glm::translate(model, m_Position);	
+	
 	model = glm::rotate(model, glm::radians(m_Rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
 	model = glm::rotate(model, glm::radians(m_Rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
 	model = glm::rotate(model, glm::radians(m_Rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));

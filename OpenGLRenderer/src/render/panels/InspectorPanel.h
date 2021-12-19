@@ -12,6 +12,6 @@ public:
 private:
 	void DisplayUniformVariable(char* buffer, Uniform& uniform);
 	void DisplayTextureUniform(TextureUniform& uniform);
-	void DisplayObjectInfo(GameObject* object, SceneView* m_Sceneview);
+	void DisplayObjectInfo(GameObject* object);
 };
 

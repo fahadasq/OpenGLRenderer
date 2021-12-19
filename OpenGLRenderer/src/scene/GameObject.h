@@ -16,13 +16,14 @@ private:
 
 public:
 	GameObject();
-	GameObject(const char* meshFilePath);
-	GameObject(const char* vFilePath, const char* fFilePath, const char* gFilePath = nullptr);
-	GameObject(const char* meshFilePath, const char* vFilePath, const char* fFilePath, const char* gFilePath = nullptr);
+	GameObject(const char* meshFilePath, const char* materialFilePath);
 	~GameObject();
 
-	void SetMaterial(const char* vFilePath, const char* fFilePath, const char* gFilePath = nullptr);
+	void SetMaterial(const char* filePath);
 	void SetMesh(const char* meshFilePath);
+	void SetMeshAsset(const char* meshFilePath);
+	void SetMaterialAsset(const char* materialFilePath);
+	void SetShaderAsset(const char* vShader, const char* fShader, const char* gShader = nullptr);
 
 	void Bind();
 
@@ -33,6 +34,9 @@ public:
 
 	Transform& GetTransform() { return m_Transform; }
 	MaterialInstance* GetMaterial() const { return ((m_Material) ? m_Material.get() : nullptr); }
+
+	void SerializeMesh(const std::string& filepath);
+	void SerializeMaterial(const std::string& filepath);
 
 	const uint64_t& GetID() const { return m_UUID; }
 	const std::shared_ptr<Mesh>& GetMesh() const { return ((m_Mesh) ? m_Mesh : nullptr); }

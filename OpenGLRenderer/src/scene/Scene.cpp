@@ -29,7 +29,7 @@ void Scene::CreateObject(bool empty)
 	std::shared_ptr<GameObject> object;
 	if (!empty)
 	{
-		object = std::make_shared<GameObject>("res/models/cube.obj", "res/shaders/basic.vert", "res/shaders/basic.frag", nullptr);
+		object = std::make_shared<GameObject>();
 	}
 	else
 	{

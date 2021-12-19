@@ -2,38 +2,29 @@
 #include "GameObject.h"
 #include <ErrorHandler.h>
 #include <ResourceManager.h>
+#include <Stats.h>
 
 GameObject::GameObject()
 	: m_UUID(), m_Name("Object")
 {
+	//m_Mesh = std::make_shared<Mesh>();
+	//m_Material = std::make_unique<MaterialInstance>();
 }
 
-GameObject::GameObject(const char* meshFilePath)
+GameObject::GameObject(const char* meshFilePath, const char* materialFilePath)
 	: m_UUID(), m_Name("Object")
 {
 	SetMesh(meshFilePath);
-}
-
-GameObject::GameObject(const char* vFilePath, const char* fFilePath, const char* gFilePath)
-	: m_UUID(), m_Name("Object")
-{
-	SetMaterial(vFilePath, fFilePath, gFilePath);
-}
-
-GameObject::GameObject(const char* meshFilePath, const char* vFilePath, const char* fFilePath, const char* gFilePath)
-	: m_UUID(), m_Name("Object")
-{
-	SetMesh(meshFilePath);
-	SetMaterial(vFilePath, fFilePath, gFilePath);
+	SetMaterial(materialFilePath);
 }
 
 GameObject::~GameObject()
 {
 }
 
-void GameObject::SetMaterial(const char* vFilePath, const char* fFilePath, const char* gFilePath)
+void GameObject::SetMaterial(const char* filePath)
 {
-	m_Material = std::make_unique<MaterialInstance>(vFilePath, fFilePath, gFilePath);
+	m_Material = std::make_unique<MaterialInstance>(filePath);
 	BindUniformBlocks();
 }
 
@@ -41,6 +32,18 @@ void GameObject::SetMesh(const char* meshFilePath)
 {
 	m_Mesh = ResourceManager::GetMesh(meshFilePath);
 }
+
+void GameObject::SetMeshAsset(const char* meshFilePath)
+{
+	m_Mesh->SetAsset(meshFilePath);
+}
+
+void GameObject::SetMaterialAsset(const char* materialFilePath)
+{
+	m_Material->SetMaterialAsset(materialFilePath);
+}
+
+
 
 void GameObject::Bind()
 {
@@ -58,6 +61,7 @@ void GameObject::Render()
 		m_Transform.Update();
 		SetUniform("model", m_Transform.GetModel());
 		GLCall(glDrawElements(GL_TRIANGLES, m_Mesh->IndexCount, GL_UNSIGNED_INT, 0));
+		Stats::AddDrawCalls(1);
 	}
 }
 
@@ -69,4 +73,14 @@ void GameObject::SetUniform(const char* name, const glm::mat4& value)
 void GameObject::BindUniformBlocks()
 {
 	m_Material->GetMaterialType()->GetShader()->BindUniformBlocks();
+}
+
+void GameObject::SerializeMesh(const std::string& filepath)
+{
+	m_Mesh->Serialize(filepath);
+}
+
+void GameObject::SerializeMaterial(const std::string& filepath)
+{
+	m_Material->SerializeMaterial(filepath.c_str());
 }

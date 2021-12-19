@@ -74,12 +74,13 @@ void UIContext::PreRender()
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+
+    
+
     ImGui::Begin("InvisibleWindow", nullptr, windowFlags);
     ImGui::PopStyleVar(3);
 
     ImGuiID dockSpaceId = ImGui::GetID("InvisibleWindowDockSpace");
-
-    
 
     ImGui::DockSpace(dockSpaceId, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
     ImGui::End();

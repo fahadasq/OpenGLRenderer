@@ -1,6 +1,7 @@
 #include <pch.h>
 #include "GLWindow.h"
 #include <Input.h>
+#include <Stats.h>
 
 
 bool GLWindow::Init(int width, int height, const std::string& title)
@@ -13,7 +14,6 @@ bool GLWindow::Init(int width, int height, const std::string& title)
 	m_UICtxt->Init(this);
 
 	m_SceneView = std::make_unique<SceneView>(deltaTime);
-	m_SceneView->SetWindow((GLFWwindow*)GetNativeWindow());
 	m_EditorView = std::make_unique<EditorView>();
 
 	return true;
@@ -30,6 +30,8 @@ void GLWindow::Render()
 	float currentFrame = (float)glfwGetTime();
 	deltaTime = currentFrame - lastFrame;
 	lastFrame = currentFrame;
+
+	Stats::ResetDrawCalls();
 
 	m_RenderCtxt->PreRender();
 	m_UICtxt->PreRender();

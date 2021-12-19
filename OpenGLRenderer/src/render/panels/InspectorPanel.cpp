@@ -2,6 +2,7 @@
 #include "InspectorPanel.h"
 #include <3rdparty/imguifiledialog/ImGuiFileDialog.h>
 #include <utils/WindowPlatformUtils.h>
+#include <filesystem>
 
 InspectorPanel::InspectorPanel()
 { 
@@ -24,7 +25,7 @@ void InspectorPanel::Render(SceneView* m_Sceneview)
         id << "Object ID: " << m_Sceneview->m_SelectedObject.lock()->GetID();
         ImGui::Text(id.str().c_str());
 
-        DisplayObjectInfo(m_Sceneview->m_SelectedObject.lock().get(), m_Sceneview);
+        DisplayObjectInfo(m_Sceneview->m_SelectedObject.lock().get());
     }
 }
 
@@ -78,7 +79,7 @@ void InspectorPanel::DisplayTextureUniform(TextureUniform& uniform)
     }
 }
 
-void InspectorPanel::DisplayObjectInfo(GameObject* object, SceneView* m_Sceneview)
+void InspectorPanel::DisplayObjectInfo(GameObject* object)
 {
     if (ImGui::CollapsingHeader("Transform"))
     {
@@ -101,48 +102,60 @@ void InspectorPanel::DisplayObjectInfo(GameObject* object, SceneView* m_Scenevie
             std::string filePath = WindowFileDialog::OpenFile(".obj");
             if (!filePath.empty())
             {
-                object->SetMesh(filePath.c_str());
+                object->SetMeshAsset(filePath.c_str());
             }
-            //ImGuiFileDialog::Instance()->OpenDialog("SetMesh", "Choose File", ".obj", ".");
+
         }
 
-        //// display
-        //if (ImGuiFileDialog::Instance()->Display("SetMesh"))
-        //{
-        //    // action if OK
-        //    if (ImGuiFileDialog::Instance()->IsOk())
-        //    {
-        //        std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-        //        std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
-        //        object->SetMesh(filePathName.c_str());
-        //    }
+        if (ImGui::Button("Save Asset"))
+        {
+            std::string filePath = WindowFileDialog::SaveFile(".meshasset");
+            if (!filePath.empty())
+            {
+                object->SerializeMesh(filePath);
+            }
+        }
 
-        //    // close
-        //    ImGuiFileDialog::Instance()->Close();
-        //}
-
-        //ImGui::Spacing();
+        if (ImGui::Button("Set Mesh"))
+        {
+            std::string filePath = WindowFileDialog::OpenFile(".meshasset");
+            if (!filePath.empty())
+            {
+                object->SetMesh(filePath.c_str());
+            }
+        }
     }
 
     ImGui::Spacing();
 
     MaterialInstance* material = object->GetMaterial();
 
+    if (ImGui::Button("Set Material"))
+    {
+        std::string filePath = WindowFileDialog::OpenFile(".matasset");
+        if (!filePath.empty())
+        {
+            object->SetMaterial(filePath.c_str());
+        }
+    }
+
     if (ImGui::CollapsingHeader("Material") && material)
     {
         ImGui::Spacing();
         char* buffer = material->m_UniformBuffer;
-        std::shared_ptr<MaterialUniformLayout> uniformLayout = material->GetMaterialType()->GetUniformLayout();
-        for (Uniform uniform : uniformLayout->uniforms)
+        MaterialUniformLayout uniformLayout = material->GetMaterialType()->GetUniformLayout();
+        for (Uniform uniform : uniformLayout.uniforms)
         {
             DisplayUniformVariable(buffer, uniform);
         }
-        for (size_t i = 0; i < uniformLayout->texUniforms.size(); i++)
+        for (size_t i = 0; i < uniformLayout.texUniforms.size(); i++)
         {
-            DisplayTextureUniform(uniformLayout->texUniforms[i]);
+            DisplayTextureUniform(uniformLayout.texUniforms[i]);
         }
 
         ImGui::Spacing();
+
+        
 
         material->SetUniforms();
     }

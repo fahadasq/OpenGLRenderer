@@ -1,8 +1,10 @@
 #pragma once
 
+#include <UUID.h>
 #include <buffers/VertexBuffer.h>
 #include <buffers/IndexBuffer.h>
 #include <buffers/VertexArray.h>
+#include <AssetTypes.h>
 
 struct Vertex
 {
@@ -11,7 +13,7 @@ struct Vertex
 	glm::vec2 TexCoords;
 };
 
-class Mesh
+class Mesh : public Asset
 {
 private:
 	std::unique_ptr<VertexBuffer> m_VertexBuffer;
@@ -31,9 +33,14 @@ public:
 
 	unsigned int IndexCount;
 
-	void Load(const std::string& filepath);
+	void SetAsset(const char* filePath);
+
+	void Load(const std::string filepath);
 
 	const std::vector<Vertex>& GetVertices() const { return m_Vertices; }
 	const std::vector<unsigned int>& GetIndices() const { return m_Indices; }
+
+	void Serialize(const std::string& filepath);
+	void Deserialize(const std::string& filepath);
 };
 

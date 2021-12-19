@@ -12,17 +12,7 @@ void SceneHierarchyPanel::Render(SceneView* m_Sceneview)
 {
     ImGui::Begin("Hierarchy");
 
-    if (ImGui::BeginMenuBar())
-    {
-        if (ImGui::BeginMenu("File"))
-        {
-            if (ImGui::MenuItem("Bruh"))
-            {
-            }
-            ImGui::EndMenu();
-        }
-    ImGui::EndMenuBar();
-    }
+    
 
     uint64_t selectedID = 0;
 

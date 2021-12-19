@@ -6,9 +6,12 @@ void EditorView::Render(SceneView* m_Sceneview)
 {
     ImGuiIO& io = ImGui::GetIO();
 
+    
 
     m_HierarchyPanel->Render(m_Sceneview);
     m_InspectorPanel->Render(m_Sceneview);
+    m_ContentPanel->Render();
+    m_StatsPanel->Render();
     
 
     

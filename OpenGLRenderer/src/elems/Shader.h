@@ -2,6 +2,7 @@
 
 #include <pch.h>
 #include "Texture2D.h"
+#include <AssetTypes.h>
 
 struct Uniform
 {
@@ -120,7 +121,7 @@ struct MaterialUniformLayout
 	std::vector<TextureUniform> texUniforms;
 };
 
-class Shader
+class Shader : public ShaderAsset
 {
 private:
 	GLuint m_RendererID;
@@ -128,6 +129,7 @@ private:
 public:
 	Shader() : m_RendererID(0) { }
 	Shader(const char* vShaderFile, const char* fShaderFile, const char* gShaderFile);
+	Shader(ShaderAsset asset);
 	~Shader();
 	void Compile(const char* vertexCode, const char* fragmentCode, const char* geometryCode = nullptr);
 	void LoadShader(const char* vShaderFile, const char* fShaderFile, const char* gShaderFile = nullptr);
@@ -145,6 +147,9 @@ public:
 	void	SetUniformBindingPoint(const char* name, const unsigned int index);
 	void	BindUniformBlocks();
 	MaterialUniformLayout GetMaterialUniforms();
+
+	void Serialize(const char* filePath);
+	void Deserialize(const char* filePath);
 
 private:
 	GLint GetUniformLocation(const std::string& name);

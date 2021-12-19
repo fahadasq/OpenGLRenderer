@@ -5,7 +5,21 @@
 
 Shader::Shader(const char* vShaderFile, const char* fShaderFile, const char* gShaderFile)
 {
+    __super::ShaderAsset(vShaderFile, fShaderFile, gShaderFile);
     LoadShader(vShaderFile, fShaderFile, gShaderFile);
+}
+
+Shader::Shader(ShaderAsset asset)
+{
+    m_UUID = asset.GetID();
+    std::string vStr = asset.GetVertSourcePath();
+    std::string fStr = asset.GetFragSourcePath();
+    m_vSourceFilePath = vStr.c_str();
+    m_fSourceFilePath = fStr.c_str();
+   // m_gSourceFilePath = asset.GetGeoSourcePath();
+    std::cout << "Vertex Source: " << vStr << "\n";
+    std::cout << "Fragment Source: " << m_fSourceFilePath << "\n";
+    LoadShader(m_vSourceFilePath.c_str(), m_fSourceFilePath.c_str(), nullptr);
 }
 
 Shader::~Shader()
@@ -277,4 +291,14 @@ MaterialUniformLayout Shader::GetMaterialUniforms()
     uniformLayout.texUniforms = texUniforms;
 
     return uniformLayout;
+}
+
+void Shader::Serialize(const char* filePath)
+{
+    __super::Serialize(filePath);
+}
+
+void Shader::Deserialize(const char* filePath)
+{
+    __super::Deserialize(filePath);
 }

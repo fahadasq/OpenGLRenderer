@@ -4,23 +4,43 @@
 #include <yaml-cpp/yaml.h>
 
 Material::Material()
-	: m_Shader(nullptr), m_UniformLayout(nullptr), m_BufferSize(0)
+	: m_Shader(nullptr), m_UniformLayout(), m_BufferSize(0)
 {
-
+	m_UUID = UniversallyUniqueID();
 }
 
-Material::Material(const char* vShaderFile, const char* fShaderFile, const char* gShaderFile)
-	: m_Shader(nullptr), m_UniformLayout(nullptr), m_BufferSize(0)
+//Material::Material(const char* filePath)
+//	: m_Shader(nullptr), m_UniformLayout(), m_BufferSize(0)
+//{
+//	m_UUID = UniversallyUniqueID();
+//	m_SourceFilePath = filePath;
+//	ShaderAsset asset = ResourceManager::AddShaderAsset(vShaderFile, fShaderFile, gShaderFile);
+//
+//	int size = 0;
+//
+//	for (int i = 0; i < m_UniformLayout.uniforms.size(); i++)
+//	{
+//		m_UniformLayout.uniforms[i].offset += size;
+//		size += m_UniformLayout.uniforms[i].size;
+//	}
+//
+//	m_BufferSize = size;
+//}
+
+Material::Material(Asset asset)
 {
-	m_Shader = ResourceManager::GetShader(vShaderFile, fShaderFile, gShaderFile);
-	m_UniformLayout = ResourceManager::GetUniformLayout(vShaderFile, fShaderFile, gShaderFile);
+	m_UUID = asset.GetID();
+	m_SourceFilePath = asset.GetSourcePath();
+	m_Type = AssetType::Material;
+	m_Shader = ResourceManager::GetShader(m_SourceFilePath.c_str());
+	m_UniformLayout = m_Shader->GetMaterialUniforms();
 
 	int size = 0;
 
-	for (int i = 0; i < m_UniformLayout->uniforms.size(); i++)
+	for (int i = 0; i < m_UniformLayout.uniforms.size(); i++)
 	{
-		m_UniformLayout->uniforms[i].offset += size;
-		size += m_UniformLayout->uniforms[i].size;
+		m_UniformLayout.uniforms[i].offset += size;
+		size += m_UniformLayout.uniforms[i].size;
 	}
 
 	m_BufferSize = size;
@@ -40,19 +60,37 @@ void Material::SetUniformBindingPoint(const char* name, const unsigned int index
 	m_Shader->SetUniformBindingPoint(name, index);
 }
 
-void Material::Generate(const char* vShaderFile, const char* fShaderFile, const char* gShaderFile)
+void Material::Generate(Asset asset)
 {
-	m_Shader = ResourceManager::GetShader(vShaderFile, fShaderFile, gShaderFile);
-	m_UniformLayout = ResourceManager::GetUniformLayout(vShaderFile, fShaderFile, gShaderFile);
+	m_UUID = asset.GetID();
+	m_SourceFilePath = asset.GetSourcePath();
+	m_Type = AssetType::Mesh;
+	m_Shader = ResourceManager::GetShader(m_SourceFilePath.c_str());
+	m_UniformLayout = m_Shader->GetMaterialUniforms();
 
 	int size = 0;
 
-	for (int i = 0; i < m_UniformLayout->uniforms.size(); i++)
+	for (int i = 0; i < m_UniformLayout.uniforms.size(); i++)
 	{
-		m_UniformLayout->uniforms[i].offset += size;
-		size += m_UniformLayout->uniforms[i].size;
+		m_UniformLayout.uniforms[i].offset += size;
+		size += m_UniformLayout.uniforms[i].size;
 	}
 
 	m_BufferSize = size;
+}
+
+void Material::SetMaterialAsset(const char* filePath)
+{
+	m_SourceFilePath = filePath;
+}
+
+void Material::Serialize(const char* filePath)
+{
+	__super::Serialize(filePath);
+}
+
+void Material::Deserialize(const char* filePath)
+{
+	__super::Deserialize(filePath);
 }
 
