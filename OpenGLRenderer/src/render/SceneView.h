@@ -26,17 +26,24 @@ private:
 	std::unique_ptr<FrameBuffer> m_FrameBuffer;
 	glm::vec2 m_Size;
 
+	int m_GizmoType = 0;
+	int m_GizmoMode = 0;
+
 	bool m_MouseHovered;
+	bool m_ViewportFocused = false, m_ViewportHovered = false;
+	glm::vec2 m_ViewportBounds[2];
 
 public:
 	std::weak_ptr<GameObject> m_SelectedObject;
 	std::unique_ptr<Scene> m_Scene;
 	
-
 	SceneView(float deltaTime)
 	{
-		m_FrameBuffer = std::make_unique<FrameBuffer>();
-		m_FrameBuffer->GenerateBuffers(2560, 1440);
+		FramebufferSpecification specs = { 2560, 1440 };
+		specs.Width = 2560;
+		specs.Height = 1440;
+		specs.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::DEPTH };
+		m_FrameBuffer = std::make_unique<FrameBuffer>(specs);
 		m_Size = glm::vec2(2560.0f, 1440.0f);
 		m_UniformBuffer = std::make_unique<UniformBuffer>();
 		m_VP = std::make_unique<ViewProjection>();
@@ -63,6 +70,7 @@ public:
 		m_Camera->OnScroll(deltaTime, scroll);
 	}
 
+	void HandleShortcutCommands();
 
 	const bool& IsMouseHovered() const { return m_MouseHovered; }
 	bool CameraMovable = false;

@@ -15,6 +15,8 @@ void Scene::Render()
 {
 	for (int i = 0; i < m_Objects.size(); i++)
 	{
+		m_Objects[i]->Bind();
+		m_Objects[i]->SetUniform("u_ID", i);
 		m_Objects[i]->Render();
 	}
 }
@@ -29,7 +31,7 @@ void Scene::CreateObject(bool empty)
 	std::shared_ptr<GameObject> object;
 	if (!empty)
 	{
-		object = std::make_shared<GameObject>();
+		object = std::make_shared<GameObject>("res/cube.meshasset", "res/bruhv.matasset");
 	}
 	else
 	{

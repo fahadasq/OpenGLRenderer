@@ -16,9 +16,6 @@ Shader::Shader(ShaderAsset asset)
     std::string fStr = asset.GetFragSourcePath();
     m_vSourceFilePath = vStr.c_str();
     m_fSourceFilePath = fStr.c_str();
-   // m_gSourceFilePath = asset.GetGeoSourcePath();
-    std::cout << "Vertex Source: " << vStr << "\n";
-    std::cout << "Fragment Source: " << m_fSourceFilePath << "\n";
     LoadShader(m_vSourceFilePath.c_str(), m_fSourceFilePath.c_str(), nullptr);
 }
 

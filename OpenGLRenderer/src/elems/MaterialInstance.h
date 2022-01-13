@@ -10,6 +10,7 @@ private:
 public:
 
 	char* m_UniformBuffer;
+	std::vector<std::shared_ptr<Texture2D>> m_Textures;
 
 	MaterialInstance();
 	MaterialInstance(const char* filePath);
@@ -28,6 +29,6 @@ public:
 
 	void SerializeMaterial(const char* filePath);
 
-	std::shared_ptr<Material>& GetMaterialType() { return m_MaterialType; }
+	std::shared_ptr<Material> GetMaterialType() { return m_MaterialType; }
 };
 

@@ -11,9 +11,15 @@ MaterialInstance::MaterialInstance(const char* filePath)
 {
 	m_MaterialType = ResourceManager::GetMaterial(filePath);
 	m_UniformBuffer = new char[m_MaterialType->GetBufferSize()];
+	
 	for (Uniform i : m_MaterialType->GetUniformLayout().uniforms)
 	{
 		Uniform::SetDefaultValue(&m_UniformBuffer[i.offset], i.type);
+	}
+
+	for (TextureUniform i : m_MaterialType->GetUniformLayout().texUniforms)
+	{
+		m_Textures.push_back(std::make_shared<Texture2D>());
 	}
 }
 
@@ -26,9 +32,15 @@ void MaterialInstance::Generate(const char* filePath)
 {
 	m_MaterialType = ResourceManager::GetMaterial(filePath);
 	m_UniformBuffer = new char[m_MaterialType->GetBufferSize()];
+
 	for (Uniform i : m_MaterialType->GetUniformLayout().uniforms)
 	{
 		Uniform::SetDefaultValue(&m_UniformBuffer[i.offset], i.type);
+	}
+
+	for (TextureUniform i : m_MaterialType->GetUniformLayout().texUniforms)
+	{
+		m_Textures.push_back(std::make_shared<Texture2D>());
 	}
 }
 
@@ -49,7 +61,7 @@ void MaterialInstance::SetUniforms()
 
 	for (unsigned int i = 0; i < uniformLayout.texUniforms.size(); i++)
 	{
-		uniformLayout.texUniforms[i].Bind();
+		m_Textures[i]->Bind(uniformLayout.texUniforms[i].slot);
 	}
 
 	for (int i = 0; i < uniformLayout.uniforms.size(); i++)

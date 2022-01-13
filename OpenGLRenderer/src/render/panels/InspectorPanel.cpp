@@ -1,12 +1,13 @@
 #include "pch.h"
 #include "InspectorPanel.h"
-#include <3rdparty/imguifiledialog/ImGuiFileDialog.h>
+//#include <3rdparty/imguifiledialog/ImGuiFileDialog.h>
 #include <utils/WindowPlatformUtils.h>
+#include "ContentBrowserPanel.h"
 #include <filesystem>
 
 InspectorPanel::InspectorPanel()
 { 
-
+    m_FilePanel = std::make_unique<AssetFilePanel>();
 }
 
 void InspectorPanel::Render(SceneView* m_Sceneview)
@@ -54,30 +55,25 @@ void InspectorPanel::DisplayUniformVariable(char* buffer, Uniform& uniform)
     }
 }
 
-void InspectorPanel::DisplayTextureUniform(TextureUniform& uniform)
+void InspectorPanel::DisplayTextureUniform(TextureUniform& uniform, std::shared_ptr<Texture2D>& texture)
 {
     // open Dialog Simple
     std::string name = uniform.name;
     name = name.substr(name.find(".") + 1);
 
     if (ImGui::Button(name.c_str()))
-        ImGuiFileDialog::Instance()->OpenDialog("SetTexture", "Choose File", ".jpg,.jpeg,.png", ".");
-
-    // display
-    if (ImGuiFileDialog::Instance()->Display("SetTexture"))
     {
-        // action if OK
-        if (ImGuiFileDialog::Instance()->IsOk())
-        {
-            std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-            std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
-            uniform.texture = ResourceManager::GetTexture(filePathName.c_str());
-        }
+        m_FilePanel->Open(".texasset");
+    }
 
-        // close
-        ImGuiFileDialog::Instance()->Close();
+    if (!m_FilePanel->GetSelected(".texasset").empty())
+    {
+        texture = ResourceManager::GetTexture(m_FilePanel->GetSelected(".texasset").c_str());
+        m_FilePanel->Close();
+        m_FilePanel->Clear();
     }
 }
+
 
 void InspectorPanel::DisplayObjectInfo(GameObject* object)
 {
@@ -95,70 +91,58 @@ void InspectorPanel::DisplayObjectInfo(GameObject* object)
 
     if (ImGui::CollapsingHeader("Mesh"))
     {
-        ImGui::Spacing();
-        // open Dialog Simple
-        if (ImGui::Button("Open..."))
-        {
-            std::string filePath = WindowFileDialog::OpenFile(".obj");
-            if (!filePath.empty())
-            {
-                object->SetMeshAsset(filePath.c_str());
-            }
-
-        }
-
-        if (ImGui::Button("Save Asset"))
-        {
-            std::string filePath = WindowFileDialog::SaveFile(".meshasset");
-            if (!filePath.empty())
-            {
-                object->SerializeMesh(filePath);
-            }
-        }
 
         if (ImGui::Button("Set Mesh"))
         {
-            std::string filePath = WindowFileDialog::OpenFile(".meshasset");
-            if (!filePath.empty())
-            {
-                object->SetMesh(filePath.c_str());
-            }
+            m_FilePanel->Open(".meshasset");
+        }
+
+        if (!m_FilePanel->GetSelected(".meshasset").empty())
+        {
+            object->SetMesh(m_FilePanel->GetSelected(".meshasset").c_str());
+            m_FilePanel->Close();
+            m_FilePanel->Clear();
         }
     }
-
-    ImGui::Spacing();
 
     MaterialInstance* material = object->GetMaterial();
 
-    if (ImGui::Button("Set Material"))
+    
+
+    if (ImGui::CollapsingHeader("Material"))
     {
-        std::string filePath = WindowFileDialog::OpenFile(".matasset");
-        if (!filePath.empty())
+        if (material)
         {
-            object->SetMaterial(filePath.c_str());
+            ImGui::Spacing();
+            char* buffer = material->m_UniformBuffer;
+            MaterialUniformLayout& uniformLayout = material->GetMaterialType()->GetUniformLayout();
+            for (Uniform uniform : uniformLayout.uniforms)
+            {
+                DisplayUniformVariable(buffer, uniform);
+            }
+            for (size_t i = 0; i < uniformLayout.texUniforms.size(); i++)
+            {
+                DisplayTextureUniform(uniformLayout.texUniforms[i], material->m_Textures[i]);
+            }
         }
+        if (ImGui::Button("Set Material"))
+        {
+            m_FilePanel->Open(".matasset");
+        }
+
+
+        if (!m_FilePanel->GetSelected(".matasset").empty())
+        {
+            object->SetMaterial(m_FilePanel->GetSelected(".matasset").c_str());
+            m_FilePanel->Close();
+            m_FilePanel->Clear();
+        }
+
+
+        ImGui::Spacing();
     }
 
-    if (ImGui::CollapsingHeader("Material") && material)
-    {
-        ImGui::Spacing();
-        char* buffer = material->m_UniformBuffer;
-        MaterialUniformLayout uniformLayout = material->GetMaterialType()->GetUniformLayout();
-        for (Uniform uniform : uniformLayout.uniforms)
-        {
-            DisplayUniformVariable(buffer, uniform);
-        }
-        for (size_t i = 0; i < uniformLayout.texUniforms.size(); i++)
-        {
-            DisplayTextureUniform(uniformLayout.texUniforms[i]);
-        }
-
-        ImGui::Spacing();
-
-        
-
-        material->SetUniforms();
-    }
+    m_FilePanel->Display();
 
 
 }

@@ -31,8 +31,6 @@ std::shared_ptr<Shader> ResourceManager::GetShader(const char* filepath)
 
 	ShaderAsset asset;	
 	asset.Deserialize(filepath);
-	std::cout << "File Path: " << filepath << "\n";
-	std::cout << "Shader Asset Vertex: " << asset.GetVertSourcePath() << "\n";
 	std::shared_ptr<Shader> shader = std::make_shared<Shader>(asset);
 	m_LoadedShaders[ID] = shader;
 	return shader;
@@ -59,6 +57,7 @@ std::shared_ptr<Material> ResourceManager::GetMaterial(const char* filepath)
 
 	Asset asset;
 	asset.Deserialize(filepath);
+	m_AssetRepository[ID] = asset;
 	std::shared_ptr<Material> material = std::make_shared<Material>(asset);
 	m_LoadedMaterials[ID] = material;
 	return material;
@@ -87,10 +86,11 @@ std::shared_ptr<Texture2D> ResourceManager::GetTexture(const char* filepath)
 	Asset asset;
 	asset.Deserialize(filepath);
 	m_AssetRepository[ID] = asset;
-	std::shared_ptr<Texture2D> tex = std::make_shared<Texture2D>();
-	tex->LoadTextureFromFile(asset.GetSourcePath().c_str());
-	m_LoadedTextures[ID] = tex;
-	return tex;
+	std::string filePath = asset.GetSourcePath();
+	std::shared_ptr<Texture2D> texture = std::make_shared<Texture2D>();
+	texture->LoadTextureFromFile(filePath.c_str());
+	m_LoadedTextures[ID] = texture;
+	return texture;
 }
 
 std::shared_ptr<Mesh> ResourceManager::GetMesh(const char* filepath)
@@ -106,8 +106,7 @@ std::shared_ptr<Mesh> ResourceManager::GetMesh(const char* filepath)
 		else
 		{
 			Asset asset = m_AssetRepository[ID];
-			std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>();
-			mesh->Load(asset.GetSourcePath());
+			std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>(asset);
 			m_LoadedMeshes[ID] = mesh;
 			return mesh;
 		}
@@ -116,8 +115,7 @@ std::shared_ptr<Mesh> ResourceManager::GetMesh(const char* filepath)
 	Asset asset;
 	asset.Deserialize(filepath);
 	m_AssetRepository[ID] = asset;
-	std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>();
-	mesh->Load(asset.GetSourcePath());
+	std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>(asset);
 	m_LoadedMeshes[ID] = mesh;
 	return mesh;
 }

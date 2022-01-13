@@ -25,6 +25,7 @@ private:
 
 public:
 	Mesh();
+	Mesh(Asset asset);
 	~Mesh();
 
 	void CreateBuffers();

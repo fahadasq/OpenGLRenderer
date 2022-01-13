@@ -95,7 +95,7 @@ public:
 		m_fSourceFilePath(fSource), m_gSourceFilePath(gSource) { }
 	ShaderAsset(const char* vSource, const char* fSource, const char* gSource = nullptr)
 		: m_UUID(), m_vSourceFilePath(vSource), m_fSourceFilePath(fSource),
-		m_gSourceFilePath(gSource) { }
+		m_gSourceFilePath() { }
 	ShaderAsset()
 		: m_UUID(), m_vSourceFilePath(), m_fSourceFilePath(),
 		m_gSourceFilePath() { }

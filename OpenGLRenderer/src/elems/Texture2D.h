@@ -1,8 +1,10 @@
 #pragma once
 
-#include <pch.h>
 
-class Texture2D
+#include <pch.h>
+#include <AssetTypes.h>
+
+class Texture2D : public Asset
 {
 private:
 	GLuint m_RendererID;
@@ -18,6 +20,7 @@ public:
     unsigned int Filter_Max;
 
     Texture2D();
+    Texture2D(Asset asset);
     ~Texture2D();
 
     void Generate(unsigned int width, unsigned int height, unsigned char* data);

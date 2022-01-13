@@ -38,6 +38,7 @@ void GLWindow::Render()
 
 
 	m_SceneView->Render(deltaTime);
+	if (m_UICtxt->ShowEditor())
 	m_EditorView->Render(m_SceneView.get());
 
 	m_UICtxt->PostRender();

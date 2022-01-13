@@ -7,7 +7,19 @@ Texture2D::Texture2D()
 	: m_Width(0), m_Height(0), Internal_Format(GL_RGB), Image_Format(GL_RGB), Wrap_S(GL_REPEAT), Wrap_T(GL_REPEAT),
 	Filter_Min(GL_LINEAR), Filter_Max(GL_LINEAR)
 {
+	m_UUID = UniversallyUniqueID();
+	m_SourceFilePath = std::string();
+	m_Type = AssetType::Texture2D;
 	GLCall(glGenTextures(1, &m_RendererID));
+}
+
+Texture2D::Texture2D(Asset asset)
+{
+	m_UUID = asset.GetID();
+	m_SourceFilePath = asset.GetSourcePath();
+	m_Type = AssetType::Texture2D;
+	GLCall(glGenTextures(1, &m_RendererID));
+	LoadTextureFromFile(m_SourceFilePath.c_str());
 }
 
 Texture2D::~Texture2D()
@@ -44,10 +56,12 @@ void Texture2D::LoadTextureFromFile(const char* file, bool alpha)
 		Image_Format = GL_RGBA;
 	}
 	// load image
+	std::cout << "File Path TextureGen: " << file << std::endl;
 	int width, height, nrChannels;
 	unsigned char* data = stbi_load(file, &width, &height, &nrChannels, 0);
 	// now generate texture
 	Generate(width, height, data);
 	// and finally free image data
 	stbi_image_free(data);
+	m_SourceFilePath = std::string(file);
 }

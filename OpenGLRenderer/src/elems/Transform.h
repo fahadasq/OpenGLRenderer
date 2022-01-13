@@ -3,6 +3,7 @@ class Transform
 {
 private:
 	glm::mat4 m_Model;
+	glm::quat m_Quat;
 public:
 	glm::vec3 m_Position;
 	glm::vec3 m_Rotation;

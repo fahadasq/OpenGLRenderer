@@ -5,7 +5,7 @@
 
 #include <3rdparty/imgui/imgui_impl_glfw.h>
 #include <3rdparty/imgui/imgui_impl_opengl3.h>
-
+#include <3rdparty/imguizmo/ImGuizmo.h>
 
 bool UIContext::Init(IWindow* window)
 {
@@ -47,6 +47,8 @@ bool UIContext::Init(IWindow* window)
         style.Colors[ImGuiCol_WindowBg].w = 1.0f;
     }
 
+    m_ShowEditor = true;
+
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*)m_Window->GetNativeWindow(), false);
     ImGui_ImplOpenGL3_Init(glsl_version);
@@ -59,9 +61,12 @@ void UIContext::PreRender()
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
+    ImGuizmo::BeginFrame();
+
+    
 
     // Create the docking environment
-    ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar |
+    ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDocking |
         ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
         ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus |
         ImGuiWindowFlags_NoBackground;
@@ -79,6 +84,19 @@ void UIContext::PreRender()
 
     ImGui::Begin("InvisibleWindow", nullptr, windowFlags);
     ImGui::PopStyleVar(3);
+    
+    if (ImGui::BeginMainMenuBar())
+    {
+        if (ImGui::BeginMenu("File"))
+        {
+            if (ImGui::MenuItem("Toggle Editor"))
+            {
+                m_ShowEditor = !m_ShowEditor;
+            }
+            ImGui::EndMenu();
+        }
+        ImGui::EndMainMenuBar();
+    }
 
     ImGuiID dockSpaceId = ImGui::GetID("InvisibleWindowDockSpace");
 
@@ -88,7 +106,12 @@ void UIContext::PreRender()
 
 void UIContext::PostRender()
 {
+    
+
     ImGui::Render();
+
+    
+
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     ImGuiIO& io = ImGui::GetIO();

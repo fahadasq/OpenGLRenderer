@@ -21,22 +21,17 @@ public:
 
 	void SetMaterial(const char* filePath);
 	void SetMesh(const char* meshFilePath);
-	void SetMeshAsset(const char* meshFilePath);
-	void SetMaterialAsset(const char* materialFilePath);
-	void SetShaderAsset(const char* vShader, const char* fShader, const char* gShader = nullptr);
 
 	void Bind();
 
 	void Render();
 
 	void SetUniform(const char* name, const glm::mat4& value);
+	void SetUniform(const char* name, int value);
 	void BindUniformBlocks();
 
 	Transform& GetTransform() { return m_Transform; }
 	MaterialInstance* GetMaterial() const { return ((m_Material) ? m_Material.get() : nullptr); }
-
-	void SerializeMesh(const std::string& filepath);
-	void SerializeMaterial(const std::string& filepath);
 
 	const uint64_t& GetID() const { return m_UUID; }
 	const std::shared_ptr<Mesh>& GetMesh() const { return ((m_Mesh) ? m_Mesh : nullptr); }

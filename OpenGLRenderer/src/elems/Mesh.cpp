@@ -16,6 +16,19 @@ Mesh::Mesh()
     m_VertexArray = std::make_unique<VertexArray>();
 }
 
+Mesh::Mesh(Asset asset)
+{
+    m_UUID = asset.GetID();
+    m_SourceFilePath = asset.GetSourcePath();
+    m_Type = AssetType::Mesh;
+    m_VertexBuffer = std::make_unique<VertexBuffer>();
+    m_IndexBuffer = std::make_unique<IndexBuffer>();
+    m_BufferLayout = std::make_unique<VertexBufferLayout>();
+    m_VertexArray = std::make_unique<VertexArray>();
+
+    Load(m_SourceFilePath);
+}
+
 Mesh::~Mesh()
 {
 }

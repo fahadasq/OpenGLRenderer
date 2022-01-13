@@ -16,6 +16,8 @@ IndexBuffer::IndexBuffer(const GLvoid* data, const GLsizeiptr& size)
 	m_Count = size / sizeof(unsigned int);
 }
 
+
+
 IndexBuffer::~IndexBuffer()
 {
 	GLCall(glDeleteBuffers(1, &m_RendererID));

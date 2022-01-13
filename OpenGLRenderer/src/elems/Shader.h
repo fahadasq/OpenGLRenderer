@@ -107,12 +107,10 @@ struct TextureUniform
 public:
 	unsigned int slot;
 	std::string name;
-	std::shared_ptr<Texture2D> texture;
 
-	TextureUniform() : slot(0), name(""), texture(nullptr) { }
-	TextureUniform(unsigned int slot, const char* name) : slot(slot), name(name) { texture = std::make_shared<Texture2D>(); }
+	TextureUniform() : slot(0), name("") { }
+	TextureUniform(unsigned int slot, const char* name) : slot(slot), name(name) { }
 
-	void Bind() const { texture->Bind(slot); }
 };
 
 struct MaterialUniformLayout

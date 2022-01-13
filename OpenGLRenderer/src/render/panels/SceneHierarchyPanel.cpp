@@ -12,8 +12,7 @@ void SceneHierarchyPanel::Render(SceneView* m_Sceneview)
 {
     ImGui::Begin("Hierarchy");
 
-    
-
+	
     uint64_t selectedID = 0;
 
     if (ImGui::BeginPopupContextWindow())
@@ -21,11 +20,6 @@ void SceneHierarchyPanel::Render(SceneView* m_Sceneview)
         if (ImGui::MenuItem("Default Object"))
         {
             m_Sceneview->m_Scene->CreateObject();
-        }
-
-        if (ImGui::MenuItem("Empty Object"))
-        {
-            m_Sceneview->m_Scene->CreateObject(true);
         }
 
         ImGui::EndPopup();
